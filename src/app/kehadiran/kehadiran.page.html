@@ -1,0 +1,346 @@
+<ion-content class="kehadiran-content">
+  <div class="kehadiran-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <ion-button fill="clear" class="back-btn" (click)="goBack()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <div>
+          <h1 class="page-title">📋 Kehadiran Pekerja</h1>
+          <p class="page-subtitle">Pantau kehadiran pekerja di lahan pertanian</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <ion-button class="filter-btn" fill="outline" (click)="toggleFilter()">
+          <ion-icon name="funnel-outline"></ion-icon>
+          <span>Filter</span>
+        </ion-button>
+        <ion-button class="export-btn" fill="solid" (click)="exportData()">
+          <ion-icon name="download-outline"></ion-icon>
+          <span>Export</span>
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Info Petani -->
+    <div class="info-card">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Nama Petani</span>
+          <span class="info-value">{{ namaPetani }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">NIK</span>
+          <span class="info-value">{{ nikPetani }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Lahan</span>
+          <span class="info-value">{{ lahanPetani }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Periode</span>
+          <span class="info-value">{{ periode }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Total Pekerja</span>
+          <span class="info-value">{{ pekerja.length }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Kehadiran</span>
+          <span class="info-value" style="color: #2e7d32;">{{ persentaseKehadiran }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-section" *ngIf="showFilter">
+      <div class="filter-grid">
+        <div class="filter-item">
+          <label class="filter-label">Status Kehadiran</label>
+          <ion-select [(ngModel)]="selectedStatus" interface="action-sheet" (ionChange)="onFilterChange()">
+            <ion-select-option value="semua">Semua</ion-select-option>
+            <ion-select-option value="hadir">Hadir</ion-select-option>
+            <ion-select-option value="izin">Izin</ion-select-option>
+            <ion-select-option value="sakit">Sakit</ion-select-option>
+            <ion-select-option value="alpha">Alpha</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">Status Aktif</label>
+          <ion-select [(ngModel)]="selectedAktif" interface="action-sheet" (ionChange)="onFilterChange()">
+            <ion-select-option value="semua">Semua</ion-select-option>
+            <ion-select-option value="aktif">Aktif</ion-select-option>
+            <ion-select-option value="tidak">Tidak Aktif</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">Tanggal</label>
+          <ion-input 
+            type="date" 
+            [(ngModel)]="selectedTanggal" 
+            (ionChange)="onFilterChange()"
+            class="date-input"
+          ></ion-input>
+        </div>
+      </div>
+    </div>
+
+    <!-- Peringatan -->
+    <div class="warning-card" *ngIf="showWarning">
+      <ion-icon name="warning-outline"></ion-icon>
+      <span>{{ pesanPeringatan }}</span>
+    </div>
+
+    <!-- Tabel Kehadiran -->
+    <div class="table-card">
+      <div class="table-header">
+        <h4 class="table-title">📊 Daftar Kehadiran Pekerja</h4>
+        <div class="table-actions">
+          <span class="total-data">Menampilkan {{ filteredPekerja.length }} dari {{ pekerja.length }} pekerja</span>
+          <ion-button class="tambah-btn" fill="solid" size="small" (click)="tambahKaryawan()">
+            <ion-icon name="add-outline"></ion-icon>
+            Tambah
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="kehadiran-table">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th class="col-nama">Nama Pekerja</th>
+              <th class="col-role">Posisi</th>
+              <th class="col-status">Status</th>
+              <th class="col-alasan">Alasan</th>
+              <th class="col-aktif">Aktif</th>
+              <th class="col-aksi">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of paginatedData; let i = index">
+              <td class="col-no">{{ i + 1 + (currentPage - 1) * rowsPerPage }}</td>
+              <td class="col-nama">
+                <div class="pekerja-info">
+                  <img 
+                    [src]="item.avatar || 'https://ui-avatars.com/api/?name=' + item.nama + '&background=2e7d32&color=fff&size=64&bold=true'" 
+                    alt="Avatar"
+                    class="avatar-small"
+                  />
+                  <span class="nama-pekerja" [class.tidak-aktif]="!item.aktif">{{ item.nama }}</span>
+                </div>
+              </td>
+              <td class="col-role">
+                <span class="role-badge">{{ item.posisi }}</span>
+              </td>
+              <td class="col-status">
+                <div class="status-select-wrapper">
+                  <ion-select 
+                    [(ngModel)]="item.status" 
+                    interface="action-sheet"
+                    (ionChange)="updateStatus(item)"
+                    class="status-select"
+                    [class.hadir]="item.status === 'hadir'"
+                    [class.izin]="item.status === 'izin'"
+                    [class.sakit]="item.status === 'sakit'"
+                    [class.alpha]="item.status === 'alpha'"
+                    [disabled]="!item.aktif"
+                  >
+                    <ion-select-option value="hadir">✅ Hadir</ion-select-option>
+                    <ion-select-option value="izin">⏰ Izin</ion-select-option>
+                    <ion-select-option value="sakit">💊 Sakit</ion-select-option>
+                    <ion-select-option value="alpha">❌ Alpha</ion-select-option>
+                  </ion-select>
+                </div>
+              </td>
+              <td class="col-alasan">
+                <ion-input 
+                  type="text" 
+                  placeholder="Alasan tidak hadir..."
+                  [(ngModel)]="item.alasan"
+                  (ionChange)="updateAlasan(item)"
+                  class="alasan-input"
+                  [disabled]="item.status === 'hadir' || !item.aktif"
+                ></ion-input>
+              </td>
+              <td class="col-aktif">
+                <div class="aktif-toggle">
+                  <ion-toggle 
+                    [(ngModel)]="item.aktif" 
+                    (ionChange)="toggleAktif(item)"
+                    color="success"
+                  ></ion-toggle>
+                  <span class="aktif-label" [class.aktif]="item.aktif" [class.tidak]="!item.aktif">
+                    {{ item.aktif ? 'Aktif' : 'Tidak Aktif' }}
+                  </span>
+                </div>
+              </td>
+              <td class="col-aksi">
+                <ion-button 
+                  fill="clear" 
+                  size="small" 
+                  class="hapus-btn"
+                  (click)="hapusKaryawan(item, i)"
+                >
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer Tabel -->
+      <div class="table-footer">
+        <div class="footer-left">
+          <span>Rows per page:</span>
+          <ion-select [(ngModel)]="rowsPerPage" interface="action-sheet" (ionChange)="onRowsPerPageChange()">
+            <ion-select-option value="5">5</ion-select-option>
+            <ion-select-option value="10">10</ion-select-option>
+            <ion-select-option value="25">25</ion-select-option>
+            <ion-select-option value="50">50</ion-select-option>
+          </ion-select>
+          <span>{{ getPaginationText() }}</span>
+        </div>
+        <div class="footer-right">
+          <ion-button fill="clear" size="small" (click)="prevPage()" [disabled]="currentPage === 1">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </ion-button>
+          <span class="page-info">{{ currentPage }} - {{ totalPages }} of {{ totalPages }}</span>
+          <ion-button fill="clear" size="small" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ringkasan Kehadiran -->
+    <div class="summary-card">
+      <div class="summary-header">
+        <h4 class="summary-title">📊 Ringkasan Kehadiran</h4>
+        <span class="summary-date">{{ todayDate | date:'EEEE, dd MMMM yyyy' }}</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-item hadir">
+          <div class="summary-icon">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </div>
+          <div class="summary-info">
+            <span class="summary-value">{{ totalHadir }}</span>
+            <span class="summary-label">Hadir</span>
+          </div>
+          <div class="summary-percent">{{ hitungPersentase('hadir') }}%</div>
+        </div>
+        <div class="summary-item izin">
+          <div class="summary-icon">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <div class="summary-info">
+            <span class="summary-value">{{ totalIzin }}</span>
+            <span class="summary-label">Izin</span>
+          </div>
+          <div class="summary-percent">{{ hitungPersentase('izin') }}%</div>
+        </div>
+        <div class="summary-item sakit">
+          <div class="summary-icon">
+            <ion-icon name="medkit-outline"></ion-icon>
+          </div>
+          <div class="summary-info">
+            <span class="summary-value">{{ totalSakit }}</span>
+            <span class="summary-label">Sakit</span>
+          </div>
+          <div class="summary-percent">{{ hitungPersentase('sakit') }}%</div>
+        </div>
+        <div class="summary-item alpha">
+          <div class="summary-icon">
+            <ion-icon name="close-circle-outline"></ion-icon>
+          </div>
+          <div class="summary-info">
+            <span class="summary-value">{{ totalAlpha }}</span>
+            <span class="summary-label">Alpha</span>
+          </div>
+          <div class="summary-percent">{{ hitungPersentase('alpha') }}%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tombol Simpan Semua -->
+    <div class="save-all-section">
+      <ion-button class="save-all-btn" expand="block" (click)="saveAll()">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        Simpan Semua Perubahan
+      </ion-button>
+    </div>
+  </div>
+</ion-content>
+
+<!-- Modal Tambah Karyawan -->
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Tambah Karyawan</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="modal-content">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap</label>
+          <ion-input 
+            type="text" 
+            placeholder="Masukkan nama karyawan"
+            [(ngModel)]="newKaryawan.nama"
+            class="form-input"
+          ></ion-input>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Posisi</label>
+          <ion-select 
+            [(ngModel)]="newKaryawan.posisi" 
+            interface="action-sheet"
+            class="form-select"
+            placeholder="Pilih posisi"
+          >
+            <ion-select-option value="Kepala Lahan">Kepala Lahan</ion-select-option>
+            <ion-select-option value="Petani">Petani</ion-select-option>
+            <ion-select-option value="Penyemprot">Penyemprot</ion-select-option>
+            <ion-select-option value="Pemanen">Pemanen</ion-select-option>
+            <ion-select-option value="Lainnya">Lainnya</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status Awal</label>
+          <ion-select 
+            [(ngModel)]="newKaryawan.status" 
+            interface="action-sheet"
+            class="form-select"
+          >
+            <ion-select-option value="hadir">Hadir</ion-select-option>
+            <ion-select-option value="izin">Izin</ion-select-option>
+            <ion-select-option value="sakit">Sakit</ion-select-option>
+            <ion-select-option value="alpha">Alpha</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="modal-actions">
+          <ion-button class="cancel-modal-btn" fill="outline" (click)="closeModal()">
+            Batal
+          </ion-button>
+          <ion-button 
+            class="submit-modal-btn" 
+            (click)="simpanKaryawan()"
+            [disabled]="!newKaryawan.nama || !newKaryawan.posisi"
+          >
+            <ion-icon name="save-outline" slot="start"></ion-icon>
+            Simpan
+          </ion-button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

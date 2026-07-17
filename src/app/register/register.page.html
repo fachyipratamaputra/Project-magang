@@ -1,0 +1,198 @@
+<ion-content class="register-content">
+  <!-- Background dengan gradien -->
+  <div class="background-gradient">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header animate-slide-down">
+      <div class="logo-wrapper">
+        <div class="logo-background">
+          <ion-icon name="person-add-outline" class="logo-icon"></ion-icon>
+        </div>
+      </div>
+      
+      <div class="header-text">
+        <h1 class="app-title">Petani</h1>
+        <h2 class="welcome-text">Bergabung Bersama Kami! 🌱</h2>
+        <p class="sub-text">Daftar akun untuk mulai menikmati<br>layanan pertanian terbaik</p>
+      </div>
+    </div>
+
+    <!-- Card Register -->
+    <div class="register-card animate-slide-up">
+      <div class="card-header">
+        <div class="header-icon">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <h3 class="card-title">Buat Akun Baru</h3>
+        <p class="card-subtitle">Isi data diri Anda dengan lengkap</p>
+      </div>
+
+      <!-- Form Register -->
+      <form (ngSubmit)="onRegister()" class="register-form">
+        <!-- Nama Lengkap -->
+        <div class="input-group">
+          <div class="input-icon">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+          <div class="input-field">
+            <label class="input-label">Nama Lengkap</label>
+            <input
+              type="text"
+              placeholder="Masukkan nama lengkap"
+              [(ngModel)]="fullname"
+              name="fullname"
+              class="custom-input"
+              [class.filled]="fullname.length > 0"
+              required
+            />
+            <div class="input-underline"></div>
+          </div>
+        </div>
+
+        <!-- Username -->
+        <div class="input-group">
+          <div class="input-icon">
+            <ion-icon name="at-outline"></ion-icon>
+          </div>
+          <div class="input-field">
+            <label class="input-label">Username</label>
+            <input
+              type="text"
+              placeholder="Masukkan username"
+              [(ngModel)]="username"
+              name="username"
+              class="custom-input"
+              [class.filled]="username.length > 0"
+              required
+            />
+            <div class="input-underline"></div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="input-group">
+          <div class="input-icon">
+            <ion-icon name="mail-outline"></ion-icon>
+          </div>
+          <div class="input-field">
+            <label class="input-label">Email</label>
+            <input
+              type="email"
+              placeholder="Masukkan email aktif"
+              [(ngModel)]="email"
+              name="email"
+              class="custom-input"
+              [class.filled]="email.length > 0"
+              required
+            />
+            <div class="input-underline"></div>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+          <div class="input-icon">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+          </div>
+          <div class="input-field">
+            <label class="input-label">Password</label>
+            <div class="password-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Minimal 6 karakter"
+                [(ngModel)]="password"
+                name="password"
+                class="custom-input"
+                [class.filled]="password.length > 0"
+                required
+              />
+              <ion-icon 
+                [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+                class="toggle-password"
+                (click)="togglePassword()"
+              ></ion-icon>
+            </div>
+            <div class="input-underline"></div>
+          </div>
+        </div>
+
+        <!-- Konfirmasi Password -->
+        <div class="input-group">
+          <div class="input-icon">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </div>
+          <div class="input-field">
+            <label class="input-label">Konfirmasi Password</label>
+            <div class="password-wrapper">
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                placeholder="Masukkan ulang password"
+                [(ngModel)]="confirmPassword"
+                name="confirmPassword"
+                class="custom-input"
+                [class.filled]="confirmPassword.length > 0"
+                required
+              />
+              <ion-icon 
+                [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"
+                class="toggle-password"
+                (click)="toggleConfirmPassword()"
+              ></ion-icon>
+            </div>
+            <div class="input-underline"></div>
+          </div>
+        </div>
+
+        <!-- Tombol Register -->
+        <ion-button 
+          expand="block" 
+          class="register-btn" 
+          type="submit"
+          [disabled]="!fullname || !username || !email || !password || !confirmPassword"
+        >
+          <span class="btn-text">Daftar Sekarang</span>
+          <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+        </ion-button>
+
+        <!-- Login Link -->
+        <div class="login-link">
+          <span class="login-text">Sudah punya akun? </span>
+          <span class="login-link-text" (click)="goToLogin()">
+            Masuk di sini
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </span>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span class="divider-line"></span>
+          <span class="divider-text">Atau daftar dengan</span>
+          <span class="divider-line"></span>
+        </div>
+
+        <!-- Social Register -->
+        <div class="social-register">
+          <ion-button class="social-btn google-btn" (click)="onRegisterGoogle()">
+            <ion-icon slot="start" name="logo-google"></ion-icon>
+            Google
+          </ion-button>
+          
+          <ion-button class="social-btn facebook-btn" (click)="onRegisterFacebook()">
+            <ion-icon slot="start" name="logo-facebook"></ion-icon>
+            Facebook
+          </ion-button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p class="footer-text">© 2026 Petani App. All rights reserved.</p>
+    </div>
+  </div>
+</ion-content>

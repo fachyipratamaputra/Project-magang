@@ -1,0 +1,286 @@
+<ion-content class="dashboard-content">
+  <div class="dashboard-container">
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" [class.open]="isSidebarOpen">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <ion-icon name="leaf-outline" class="logo-icon"></ion-icon>
+          <span class="logo-text">Petani</span>
+        </div>
+        <ion-button class="sidebar-close" fill="clear" (click)="toggleSidebar()">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="sidebar-user">
+        <img 
+          [src]="'https://ui-avatars.com/api/?name=' + (user.nama || 'Petani') + '&background=2e7d32&color=fff&size=128&bold=true'" 
+          alt="Avatar"
+          class="sidebar-avatar"
+        />
+        <div class="sidebar-user-info">
+          <h4 class="sidebar-username">{{ user.nama || 'Petani Indonesia' }}</h4>
+          <p class="sidebar-userrole">🌾 {{ user.role === 'admin' ? 'Administrator' : 'Petani Profesional' }}</p>
+        </div>
+      </div>
+
+      <div class="sidebar-menu">
+        <div class="menu-label">OVERVIEW</div>
+        <div class="menu-item" [class.active]="activeMenu === 'beranda'" (click)="goToBeranda()">
+          <ion-icon name="home-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Beranda</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'profil'" (click)="goToProfile()">
+          <ion-icon name="person-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Profil</span>
+        </div>
+
+        <div class="menu-label">MANAJEMEN</div>
+        <div class="menu-item" [class.active]="activeMenu === 'lahan'" (click)="setActiveMenu('lahan')">
+          <ion-icon name="map-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Lahan Pertanian</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'tanaman'" (click)="setActiveMenu('tanaman')">
+          <ion-icon name="leaf-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Tanaman</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'panen'" (click)="setActiveMenu('panen')">
+          <ion-icon name="checkmark-done-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Panen</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'kehadiran'" (click)="goToKehadiran()">
+          <ion-icon name="calendar-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Kehadiran</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'pekerja'" (click)="goToPekerja()">
+          <ion-icon name="people-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Pekerja</span>
+        </div>
+
+        <div class="menu-label">LAINNYA</div>
+        <div class="menu-item" [class.active]="activeMenu === 'pembayaran'" (click)="goToPembayaran()">
+          <ion-icon name="wallet-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Pembayaran</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'bantuan'" (click)="setActiveMenu('bantuan')">
+          <ion-icon name="help-circle-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Bantuan</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'pengaturan'" (click)="setActiveMenu('pengaturan')">
+          <ion-icon name="settings-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Pengaturan</span>
+        </div>
+        <div class="menu-item logout-item" (click)="logout()">
+          <ion-icon name="log-out-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Keluar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="sidebar-overlay" [class.open]="isSidebarOpen" (click)="toggleSidebar()"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+      <!-- HEADER -->
+      <div class="main-header">
+        <div class="header-left">
+          <ion-button class="menu-toggle" fill="clear" (click)="toggleSidebar()">
+            <ion-icon name="menu-outline"></ion-icon>
+          </ion-button>
+          <div class="header-title">
+            <h1 class="page-title">{{ getPageTitle() }}</h1>
+            <p class="page-subtitle">{{ getPageSubtitle() }}</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <ion-button class="notification-btn" fill="clear">
+            <ion-icon name="notifications-outline"></ion-icon>
+            <span class="notification-badge">3</span>
+          </ion-button>
+          <div class="header-avatar" (click)="goToProfile()">
+            <img 
+              [src]="'https://ui-avatars.com/api/?name=' + (user.nama || 'Petani') + '&background=2e7d32&color=fff&size=64&bold=true'" 
+              alt="Avatar"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="content-area">
+        <!-- LOADING -->
+        <div *ngIf="isLoading" class="loading-container">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Memuat data...</p>
+        </div>
+
+        <!-- BERANDA -->
+        <div *ngIf="!isLoading && activeMenu === 'beranda'">
+          <!-- GREETING -->
+          <div class="greeting-card">
+            <div class="greeting-text">
+              <h2>Selamat Pagi, {{ user.nama || 'Petani' }}! 🌅</h2>
+              <p>Semoga hari ini penuh berkah dalam bertani</p>
+            </div>
+            <div class="greeting-date">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>{{ todayDate }}</span>
+            </div>
+          </div>
+
+          <!-- STATS -->
+          <div class="stats-grid">
+            <div class="stat-card stat-card-1" (click)="goToKehadiran()">
+              <div class="stat-icon"><ion-icon name="people-outline"></ion-icon></div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ totalPekerja }}</h3>
+                <p class="stat-label">Total Pekerja</p>
+              </div>
+              <div class="stat-trend positive">
+                <ion-icon name="arrow-up-outline"></ion-icon>
+                {{ pekerjaAktif }} Aktif
+              </div>
+            </div>
+
+            <div class="stat-card stat-card-2" (click)="goToKehadiran()">
+              <div class="stat-icon"><ion-icon name="checkmark-done-outline"></ion-icon></div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ totalKehadiran }}</h3>
+                <p class="stat-label">Hadir Hari Ini</p>
+              </div>
+              <div class="stat-trend positive">
+                <ion-icon name="arrow-up-outline"></ion-icon>
+                {{ kehadiranHadir }} Hadir
+              </div>
+            </div>
+
+            <div class="stat-card stat-card-3" (click)="goToPembayaran()">
+              <div class="stat-icon"><ion-icon name="cash-outline"></ion-icon></div>
+              <div class="stat-info">
+                <h3 class="stat-value">Rp {{ totalPembayaran.toLocaleString() }}</h3>
+                <p class="stat-label">Total Gaji</p>
+              </div>
+              <div class="stat-trend positive">
+                <ion-icon name="arrow-up-outline"></ion-icon>
+                {{ pembayaranBerhasil }} Dibayar
+              </div>
+            </div>
+
+            <div class="stat-card stat-card-4" (click)="goToProfile()">
+              <div class="stat-icon"><ion-icon name="star-outline"></ion-icon></div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ user.role === 'admin' ? 'Admin' : 'Petani' }}</h3>
+                <p class="stat-label">Role Anda</p>
+              </div>
+              <div class="stat-trend positive">
+                <ion-icon name="star-outline"></ion-icon>
+                {{ user.nama || 'Petani' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIVITY & CHART -->
+          <div class="content-grid">
+            <div class="chart-card">
+              <div class="card-header">
+                <div>
+                  <h4 class="card-title">📈 Grafik Panen</h4>
+                  <p class="card-subtitle">6 bulan terakhir</p>
+                </div>
+                <ion-button fill="clear" size="small">
+                  <ion-icon name="more-horizontal-outline"></ion-icon>
+                </ion-button>
+              </div>
+              <div class="chart-container">
+                <canvas #panenChart></canvas>
+              </div>
+            </div>
+
+            <div class="activity-card">
+              <div class="card-header">
+                <h4 class="card-title">🕐 Aktivitas Terbaru</h4>
+                <ion-button fill="clear" size="small" class="view-all">
+                  Lihat Semua <ion-icon name="chevron-forward-outline"></ion-icon>
+                </ion-button>
+              </div>
+              <div class="activity-list">
+                <div class="activity-item" *ngFor="let activity of activities">
+                  <div class="activity-icon" [class]="activity.type">
+                    <ion-icon [name]="activity.icon"></ion-icon>
+                  </div>
+                  <div class="activity-content">
+                    <p class="activity-text">{{ activity.text }}</p>
+                    <span class="activity-time">{{ activity.time }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PLANTS & TIPS -->
+          <div class="bottom-grid">
+            <div class="plants-card">
+              <div class="card-header">
+                <h4 class="card-title">🌱 Tanaman Populer</h4>
+                <ion-button fill="clear" size="small" class="view-all">
+                  Lihat Semua <ion-icon name="chevron-forward-outline"></ion-icon>
+                </ion-button>
+              </div>
+              <div class="plants-grid">
+                <div class="plant-item" *ngFor="let plant of popularPlants">
+                  <div class="plant-image-wrapper">
+                    <div class="plant-image-placeholder" [style.background]="plant.color">
+                      <ion-icon name="leaf-outline"></ion-icon>
+                    </div>
+                    <div class="plant-status" [class]="plant.status"></div>
+                  </div>
+                  <div class="plant-info">
+                    <h5 class="plant-name">{{ plant.name }}</h5>
+                    <p class="plant-detail">{{ plant.detail }}</p>
+                    <div class="plant-progress">
+                      <div class="progress-bar">
+                        <div class="progress-fill" [style.width.%]="plant.progress"></div>
+                      </div>
+                      <span class="progress-text">{{ plant.progress }}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tips-card">
+              <div class="card-header">
+                <h4 class="card-title">💡 Tips Pertanian</h4>
+                <ion-button fill="clear" size="small" class="view-all">
+                  Lihat Semua <ion-icon name="chevron-forward-outline"></ion-icon>
+                </ion-button>
+              </div>
+              <div class="tips-list">
+                <div class="tip-item" *ngFor="let tip of tips">
+                  <div class="tip-icon">
+                    <ion-icon [name]="tip.icon"></ion-icon>
+                  </div>
+                  <div class="tip-content">
+                    <h5 class="tip-title">{{ tip.title }}</h5>
+                    <p class="tip-description">{{ tip.description }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLACEHOLDER -->
+        <div *ngIf="!isLoading && activeMenu !== 'beranda'" class="placeholder-page">
+          <div class="placeholder-icon">
+            <ion-icon [name]="getMenuIcon()"></ion-icon>
+          </div>
+          <h2 class="placeholder-title">{{ getPageTitle() }}</h2>
+          <p class="placeholder-text">Halaman ini sedang dalam pengembangan</p>
+          <p class="placeholder-sub">Segera hadir untuk memudahkan aktivitas pertanian Anda 🌿</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

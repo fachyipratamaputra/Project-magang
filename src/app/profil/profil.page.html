@@ -1,0 +1,108 @@
+<ion-content class="profile-content">
+  <!-- Background Gradient -->
+  <div class="header-gradient">
+    <div class="header-back-button">
+      <ion-button fill="clear" class="back-btn" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+      <h2 class="header-title">Profil Petani</h2>
+      <ion-button fill="clear" class="edit-btn" (click)="toggleEdit()">
+        <ion-icon [name]="isEditing ? 'close-outline' : 'create-outline'"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="profile-card-wrapper">
+    <div class="profile-card">
+      <!-- Avatar & Status -->
+      <div class="avatar-section">
+        <div class="avatar-container">
+          <img 
+            [src]="profileData.avatar || 'https://ui-avatars.com/api/?name=' + profileData.nama + '&background=2e7d32&color=fff&size=200&bold=true'" 
+            alt="Profile"
+            class="profile-avatar"
+          />
+          <div class="edit-avatar-btn" (click)="changeAvatar()" *ngIf="isEditing">
+            <ion-icon name="camera-outline"></ion-icon>
+          </div>
+        </div>
+        <h2 class="profile-name">{{ profileData.nama }}</h2>
+        <p class="profile-role">🌾 {{ profileData.role }}</p>
+        <div class="profile-badge" [class.active]="profileData.status === 'Aktif'">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>Status: {{ profileData.status }}</span>
+        </div>
+      </div>
+
+      <!-- Info Detail seperti Mahasiswa -->
+      <div class="info-section">
+        <div class="section-header">
+          <h3 class="section-title">📋 Detail Petani</h3>
+          <span class="section-subtitle">Informasi lengkap profil petani</span>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item" *ngFor="let item of infoItems">
+            <div class="info-label">
+              <ion-icon [name]="item.icon"></ion-icon>
+              <span>{{ item.label }}</span>
+            </div>
+            <div class="info-value" *ngIf="!isEditing">
+              {{ item.value || '-' }}
+            </div>
+            <div class="info-value" *ngIf="isEditing">
+              <input 
+                [type]="item.type || 'text'"
+                [(ngModel)]="item.value"
+                class="edit-input"
+                [placeholder]="'Masukkan ' + item.label.toLowerCase()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi (Hanya Simpan/Batal saat edit) -->
+        <div class="action-buttons" *ngIf="isEditing">
+          <ion-button class="action-btn save-btn" (click)="saveProfile()">
+            <ion-icon name="save-outline"></ion-icon>
+            Simpan Perubahan
+          </ion-button>
+          <ion-button class="action-btn cancel-btn" fill="outline" (click)="cancelEdit()">
+            Batal
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- Menu Pengaturan -->
+      <div class="menu-section">
+        <h4 class="menu-title">⚙️ Pengaturan</h4>
+        <div class="menu-item" *ngFor="let menu of settingsMenu" (click)="menu.action()">
+          <div class="menu-left">
+            <div class="menu-icon" [style.background]="menu.color">
+              <ion-icon [name]="menu.icon"></ion-icon>
+            </div>
+            <div class="menu-content">
+              <span class="menu-label">{{ menu.label }}</span>
+              <span class="menu-description">{{ menu.description }}</span>
+            </div>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="menu-arrow"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Tombol Logout -->
+      <div class="logout-section">
+        <ion-button class="logout-btn-full" (click)="logout()">
+          <ion-icon name="log-out-outline"></ion-icon>
+          <span>Keluar</span>
+        </ion-button>
+      </div>
+
+      <!-- Versi -->
+      <div class="version">
+        <span>Versi 1.0.0</span>
+      </div>
+    </div>
+  </div>
+</ion-content>

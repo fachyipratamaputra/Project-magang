@@ -1,0 +1,136 @@
+<ion-content class="login-content">
+  <!-- Background dengan gradien -->
+  <div class="background-gradient">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+  </div>
+
+  <div class="container">
+    <!-- Header dengan animasi -->
+    <div class="header animate-slide-down">
+      <div class="logo-wrapper">
+        <div class="logo-background">
+          <ion-icon name="leaf-outline" class="logo-icon"></ion-icon>
+        </div>
+      </div>
+      
+      <div class="header-text">
+        <h1 class="app-title">Petani</h1>
+        <h2 class="welcome-text">Selamat Datang Kembali! 🌿</h2>
+        <p class="sub-text">Masuk ke akun Anda untuk mengakses<br>layanan pertanian terbaik</p>
+      </div>
+    </div>
+
+    <!-- Card Login dengan Glassmorphism -->
+    <div class="login-card animate-slide-up">
+      <div class="card-header">
+        <div class="header-icon">
+          <ion-icon name="lock-open-outline"></ion-icon>
+        </div>
+        <h3 class="card-title">Masuk ke Akun</h3>
+        <p class="card-subtitle">Silakan masukkan kredensial Anda</p>
+      </div>
+
+      <!-- Form Login -->
+      <form (ngSubmit)="onLogin()" class="login-form">
+        <!-- Username -->
+        <div class="input-group">
+          <div class="input-icon">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+          <div class="input-field">
+            <label class="input-label">Username</label>
+            <input
+              type="text"
+              placeholder="Masukkan username Anda"
+              [(ngModel)]="username"
+              name="username"
+              class="custom-input"
+              [class.filled]="username.length > 0"
+              required
+            />
+            <div class="input-underline"></div>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+          <div class="input-icon">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+          </div>
+          <div class="input-field">
+            <label class="input-label">Password</label>
+            <div class="password-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Masukkan password Anda"
+                [(ngModel)]="password"
+                name="password"
+                class="custom-input"
+                [class.filled]="password.length > 0"
+                required
+              />
+              <ion-icon 
+                [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+                class="toggle-password"
+                (click)="togglePassword()"
+              ></ion-icon>
+            </div>
+            <div class="input-underline"></div>
+          </div>
+        </div>
+
+        <!-- Lupa Password -->
+        <div class="forgot-password">
+          <a (click)="forgotPassword()">Lupa password?</a>
+        </div>
+
+        <!-- Tombol Login -->
+        <ion-button 
+          expand="block" 
+          class="login-btn" 
+          type="submit"
+          [disabled]="!username || !password"
+        >
+          <span class="btn-text">Masuk Sekarang</span>
+          <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+        </ion-button>
+
+        <!-- Register Link -->
+        <div class="register-link">
+          <span class="register-text">Belum punya akun? </span>
+          <span class="register-link-text" (click)="goToRegister()">
+            Daftar di sini
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </span>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span class="divider-line"></span>
+          <span class="divider-text">Atau lanjutkan dengan</span>
+          <span class="divider-line"></span>
+        </div>
+
+        <!-- Social Login -->
+        <div class="social-login">
+          <ion-button class="social-btn google-btn" (click)="onLoginGoogle()">
+            <ion-icon slot="start" name="logo-google"></ion-icon>
+            Google
+          </ion-button>
+          
+          <ion-button class="social-btn facebook-btn" (click)="onLoginFacebook()">
+            <ion-icon slot="start" name="logo-facebook"></ion-icon>
+            Facebook
+          </ion-button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p class="footer-text">© 2026 Petani App. All rights reserved.</p>
+    </div>
+  </div>
+</ion-content>
