@@ -1,9 +1,10 @@
 <ion-content class="register-content">
-  <!-- Background dengan gradien -->
+  <!-- Background Gradient -->
   <div class="background-gradient">
     <div class="circle circle-1"></div>
     <div class="circle circle-2"></div>
     <div class="circle circle-3"></div>
+    <div class="circle circle-4"></div>
   </div>
 
   <div class="container">
@@ -40,7 +41,7 @@
             <ion-icon name="person-outline"></ion-icon>
           </div>
           <div class="input-field">
-            <label class="input-label">Nama Lengkap</label>
+            <label class="input-label">Nama Lengkap <span class="required">*</span></label>
             <input
               type="text"
               placeholder="Masukkan nama lengkap"
@@ -54,13 +55,13 @@
           </div>
         </div>
 
-        <!-- Username -->
+        <!-- Username dengan Validasi -->
         <div class="input-group">
           <div class="input-icon">
             <ion-icon name="at-outline"></ion-icon>
           </div>
           <div class="input-field">
-            <label class="input-label">Username</label>
+            <label class="input-label">Username <span class="required">*</span></label>
             <input
               type="text"
               placeholder="Masukkan username"
@@ -68,9 +69,37 @@
               name="username"
               class="custom-input"
               [class.filled]="username.length > 0"
+              (input)="onUsernameChange()"
               required
             />
             <div class="input-underline"></div>
+            
+            <!-- 🔥 STATUS VALIDASI USERNAME -->
+            <div class="username-validation" *ngIf="username.length > 2">
+              <div class="validation-loading" *ngIf="usernameChecking">
+                <ion-spinner name="crescent"></ion-spinner>
+                <span>Mengecek username...</span>
+              </div>
+              <div class="validation-success" *ngIf="!usernameChecking && usernameAvailable && username.length >= 3">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+                <span>✅ Username tersedia!</span>
+              </div>
+              <div class="validation-error" *ngIf="!usernameChecking && !usernameAvailable && username.length >= 3">
+                <ion-icon name="close-circle-outline"></ion-icon>
+                <span>{{ usernameMessage }}</span>
+              </div>
+              <!-- 🔥 SARAN USERNAME -->
+              <div class="validation-suggestions" *ngIf="!usernameAvailable && usernameSuggestions.length > 0">
+                <span class="suggestion-label">💡 Saran username:</span>
+                <span 
+                  class="suggestion-item" 
+                  *ngFor="let suggestion of usernameSuggestions"
+                  (click)="useSuggestion(suggestion)"
+                >
+                  {{ suggestion }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -80,7 +109,7 @@
             <ion-icon name="mail-outline"></ion-icon>
           </div>
           <div class="input-field">
-            <label class="input-label">Email</label>
+            <label class="input-label">Email <span class="required">*</span></label>
             <input
               type="email"
               placeholder="Masukkan email aktif"
@@ -100,7 +129,7 @@
             <ion-icon name="lock-closed-outline"></ion-icon>
           </div>
           <div class="input-field">
-            <label class="input-label">Password</label>
+            <label class="input-label">Password <span class="required">*</span></label>
             <div class="password-wrapper">
               <input
                 [type]="showPassword ? 'text' : 'password'"
@@ -118,6 +147,9 @@
               ></ion-icon>
             </div>
             <div class="input-underline"></div>
+            <div class="password-hint" *ngIf="password.length > 0 && password.length < 6">
+              ⚠️ Password minimal 6 karakter
+            </div>
           </div>
         </div>
 
@@ -127,7 +159,7 @@
             <ion-icon name="checkmark-circle-outline"></ion-icon>
           </div>
           <div class="input-field">
-            <label class="input-label">Konfirmasi Password</label>
+            <label class="input-label">Konfirmasi Password <span class="required">*</span></label>
             <div class="password-wrapper">
               <input
                 [type]="showConfirmPassword ? 'text' : 'password'"
@@ -145,6 +177,14 @@
               ></ion-icon>
             </div>
             <div class="input-underline"></div>
+            <div class="password-match" *ngIf="confirmPassword.length > 0 && password.length > 0">
+              <span *ngIf="password === confirmPassword" style="color: #2e7d32;">
+                ✅ Password cocok
+              </span>
+              <span *ngIf="password !== confirmPassword" style="color: #c62828;">
+                ❌ Password tidak cocok
+              </span>
+            </div>
           </div>
         </div>
 
@@ -153,10 +193,11 @@
           expand="block" 
           class="register-btn" 
           type="submit"
-          [disabled]="!fullname || !username || !email || !password || !confirmPassword"
+          [disabled]="!fullname || !username || !email || !password || !confirmPassword || isLoading || !usernameAvailable"
         >
-          <span class="btn-text">Daftar Sekarang</span>
-          <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+          <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+          <span *ngIf="!isLoading" class="btn-text">Daftar Sekarang</span>
+          <ion-icon *ngIf="!isLoading" slot="end" name="arrow-forward-outline"></ion-icon>
         </ion-button>
 
         <!-- Login Link -->
@@ -181,7 +222,6 @@
             <ion-icon slot="start" name="logo-google"></ion-icon>
             Google
           </ion-button>
-          
           <ion-button class="social-btn facebook-btn" (click)="onRegisterFacebook()">
             <ion-icon slot="start" name="logo-facebook"></ion-icon>
             Facebook

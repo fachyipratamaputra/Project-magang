@@ -11,7 +11,9 @@
   margin: 0 auto;
 }
 
-// ===== PAGE HEADER =====
+// ============================================
+// PAGE HEADER
+// ============================================
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -31,11 +33,7 @@
   --padding-start: 4px;
   --padding-end: 4px;
   margin: 0;
-
-  ion-icon {
-    font-size: 24px;
-    color: #1a472a;
-  }
+  ion-icon { font-size: 24px; color: #1a472a; }
 }
 
 .page-title {
@@ -63,10 +61,7 @@
   font-size: 13px;
   font-weight: 500;
   text-transform: none;
-
-  ion-icon {
-    font-size: 18px;
-  }
+  ion-icon { font-size: 18px; }
 }
 
 .filter-btn {
@@ -81,66 +76,91 @@
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
 }
 
-// ===== INFO CARD =====
-.info-card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.02);
-}
-
-.info-grid {
+// ============================================
+// INFO CARDS
+// ============================================
+.info-cards {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 12px;
+  margin-bottom: 20px;
 }
 
-.info-item {
+.info-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 16px;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06); }
 }
 
-.info-label {
-  font-size: 11px;
+.info-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  ion-icon { font-size: 18px; color: #ffffff; }
+  
+  &.green { background: linear-gradient(135deg, #2e7d32, #4caf50); }
+  &.blue { background: linear-gradient(135deg, #0277bd, #42a5f5); }
+  &.orange { background: linear-gradient(135deg, #f57c00, #ffa726); }
+  &.purple { background: linear-gradient(135deg, #7b1fa2, #ab47bc); }
+  &.teal { background: linear-gradient(135deg, #00695c, #26a69a); }
+  &.red { background: linear-gradient(135deg, #c62828, #ef5350); }
+}
+
+.info-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.info-card-label {
+  display: block;
+  font-size: 10px;
   font-weight: 600;
-  color: #888;
+  color: #999;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
 }
 
-.info-value {
-  font-size: 14px;
+.info-card-value {
+  display: block;
+  font-size: 13px;
   font-weight: 600;
   color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-// ===== FILTER =====
+// ============================================
+// FILTER
+// ============================================
 .filter-section {
   background: #ffffff;
   border-radius: 14px;
-  padding: 14px 20px;
+  padding: 16px 20px;
   margin-bottom: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   animation: slideDown 0.3s ease;
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .filter-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
 }
 
@@ -168,34 +188,13 @@
   font-size: 14px;
 }
 
-// ===== WARNING CARD =====
-.warning-card {
-  background: #fff3e0;
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-left: 4px solid #f57c00;
-
-  ion-icon {
-    font-size: 20px;
-    color: #f57c00;
-  }
-
-  span {
-    font-size: 14px;
-    color: #e65100;
-    font-weight: 500;
-  }
-}
-
-// ===== TABLE CARD =====
+// ============================================
+// TABLE
+// ============================================
 .table-card {
   background: #ffffff;
   border-radius: 14px;
-  padding: 16px 20px;
+  padding: 18px 20px;
   margin-bottom: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   overflow: hidden;
@@ -208,16 +207,36 @@
   margin-bottom: 14px;
 }
 
+.table-title-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .table-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: #1a1a1a;
   margin: 0;
 }
 
-.total-data {
+.table-subtitle {
   font-size: 12px;
   color: #888;
+  margin: 0;
+}
+
+.tambah-btn {
+  --background: #2e7d32;
+  --background-activated: #1b5e20;
+  --border-radius: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  ion-icon { font-size: 16px; }
 }
 
 .table-wrapper {
@@ -233,7 +252,6 @@
   thead {
     background: #f8faf8;
     border-radius: 10px;
-
     th {
       padding: 12px 12px;
       text-align: left;
@@ -251,16 +269,9 @@
     tr {
       border-bottom: 1px solid #f0f0f0;
       transition: background 0.2s;
-
-      &:hover {
-        background: #f8faf8;
-      }
-
-      &:last-child {
-        border-bottom: none;
-      }
+      &:hover { background: #f8faf8; }
+      &:last-child { border-bottom: none; }
     }
-
     td {
       padding: 10px 12px;
       vertical-align: middle;
@@ -268,35 +279,9 @@
   }
 }
 
-.col-no {
-  width: 50px;
-  text-align: center;
-  font-weight: 600;
-  color: #888;
-}
-
-.col-nama {
-  min-width: 180px;
-}
-
-.col-role {
-  min-width: 120px;
-}
-
-.col-status {
-  min-width: 130px;
-}
-
-.col-alasan {
-  min-width: 180px;
-}
-
-.col-aksi {
-  width: 60px;
-  text-align: center;
-}
-
-// ===== PEKERJA INFO =====
+// ============================================
+// PEKERJA INFO
+// ============================================
 .pekerja-info {
   display: flex;
   align-items: center;
@@ -314,6 +299,8 @@
 .nama-pekerja {
   font-weight: 600;
   color: #1a1a1a;
+  font-size: 14px;
+  &.tidak-aktif { color: #999; text-decoration: line-through; }
 }
 
 .role-badge {
@@ -326,89 +313,68 @@
   font-weight: 600;
 }
 
-// ===== STATUS SELECT =====
-.status-select-wrapper {
-  position: relative;
-}
-
-.status-select {
-  --background: #f8faf8;
-  --border-radius: 8px;
-  --padding-start: 10px;
-  --padding-end: 10px;
-  --padding-top: 6px;
-  --padding-bottom: 6px;
-  font-size: 13px;
+// ============================================
+// STATUS BADGE
+// ============================================
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
   font-weight: 600;
-  min-width: 100px;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-
-  &.hadir {
-    --background: rgba(46, 125, 50, 0.1);
-    color: #2e7d32;
-    border-color: #2e7d32;
-  }
-
-  &.izin {
-    --background: rgba(245, 124, 0, 0.1);
-    color: #f57c00;
-    border-color: #f57c00;
-  }
-
-  &.sakit {
-    --background: rgba(198, 40, 40, 0.1);
-    color: #c62828;
-    border-color: #c62828;
-  }
-
-  &.alpha {
-    --background: rgba(117, 117, 117, 0.1);
-    color: #757575;
-    border-color: #757575;
-  }
+  
+  &.hadir { background: rgba(46, 125, 50, 0.1); color: #2e7d32; }
+  &.izin { background: rgba(245, 124, 0, 0.1); color: #f57c00; }
+  &.sakit { background: rgba(198, 40, 40, 0.1); color: #c62828; }
+  &.alpha { background: rgba(117, 117, 117, 0.1); color: #757575; }
 }
 
-// ===== ALASAN INPUT =====
+// ============================================
+// ALASAN INPUT
+// ============================================
 .alasan-input {
   --background: #f8faf8;
   --border-radius: 8px;
   --padding-start: 10px;
   --padding-end: 10px;
-  --padding-top: 6px;
-  --padding-bottom: 6px;
-  font-size: 13px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  font-size: 12px;
   border: 1px solid #e8ece7;
-
-  &:focus {
-    border-color: #2e7d32;
-  }
-
-  &[disabled] {
-    opacity: 0.5;
-  }
+  max-width: 160px;
+  &[disabled] { opacity: 0.5; }
 }
 
-// ===== SIMPAN BUTTON =====
-.simpan-btn {
+// ============================================
+// AKTIF LABEL
+// ============================================
+.aktif-label {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  &.aktif { color: #2e7d32; background: rgba(46, 125, 50, 0.1); }
+  &.tidak { color: #c62828; background: rgba(198, 40, 40, 0.1); }
+}
+
+// ============================================
+// HAPUS BUTTON
+// ============================================
+.hapus-btn {
   --padding-start: 4px;
   --padding-end: 4px;
   margin: 0;
-
   ion-icon {
     font-size: 20px;
-    color: #2e7d32;
+    color: #c62828;
+    transition: all 0.2s;
   }
-
-  &:hover {
-    ion-icon {
-      color: #1b5e20;
-    }
-  }
+  &:hover ion-icon { color: #b71c1c; transform: scale(1.2); }
 }
 
-// ===== TABLE FOOTER =====
+// ============================================
+// TABLE FOOTER
+// ============================================
 .table-footer {
   display: flex;
   justify-content: space-between;
@@ -424,7 +390,6 @@
   gap: 8px;
   font-size: 12px;
   color: #888;
-
   ion-select {
     --padding-start: 4px;
     --padding-end: 4px;
@@ -439,22 +404,12 @@
   display: flex;
   align-items: center;
   gap: 4px;
-
   ion-button {
     --padding-start: 4px;
     --padding-end: 4px;
     margin: 0;
-
-    ion-icon {
-      font-size: 18px;
-      color: #666;
-    }
-
-    &[disabled] {
-      ion-icon {
-        color: #ccc;
-      }
-    }
+    ion-icon { font-size: 18px; color: #666; }
+    &[disabled] ion-icon { color: #ccc; }
   }
 }
 
@@ -465,11 +420,13 @@
   text-align: center;
 }
 
-// ===== SUMMARY CARD =====
+// ============================================
+// SUMMARY
+// ============================================
 .summary-card {
   background: #ffffff;
   border-radius: 14px;
-  padding: 16px 20px;
+  padding: 18px 20px;
   margin-bottom: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
@@ -482,7 +439,7 @@
 }
 
 .summary-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: #1a1a1a;
   margin: 0;
@@ -507,27 +464,12 @@
   border-radius: 12px;
   background: #f8faf8;
   transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  }
-
-  &.hadir {
-    border-left: 4px solid #2e7d32;
-  }
-
-  &.izin {
-    border-left: 4px solid #f57c00;
-  }
-
-  &.sakit {
-    border-left: 4px solid #c62828;
-  }
-
-  &.alpha {
-    border-left: 4px solid #757575;
-  }
+  &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
+  
+  &.hadir { border-left: 4px solid #2e7d32; }
+  &.izin { border-left: 4px solid #f57c00; }
+  &.sakit { border-left: 4px solid #c62828; }
+  &.alpha { border-left: 4px solid #757575; }
 }
 
 .summary-icon {
@@ -537,12 +479,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
-  ion-icon {
-    font-size: 18px;
-    color: #ffffff;
-  }
-
+  ion-icon { font-size: 18px; color: #ffffff; }
+  
   .hadir & { background: linear-gradient(135deg, #2e7d32, #4caf50); }
   .izin & { background: linear-gradient(135deg, #f57c00, #ffa726); }
   .sakit & { background: linear-gradient(135deg, #c62828, #ef5350); }
@@ -570,14 +508,16 @@
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 20px;
-
+  
   .hadir & { color: #2e7d32; background: rgba(46, 125, 50, 0.1); }
   .izin & { color: #f57c00; background: rgba(245, 124, 0, 0.1); }
   .sakit & { color: #c62828; background: rgba(198, 40, 40, 0.1); }
   .alpha & { color: #757575; background: rgba(117, 117, 117, 0.1); }
 }
 
-// ===== SAVE ALL =====
+// ============================================
+// SAVE ALL
+// ============================================
 .save-all-section {
   padding: 4px 0 8px;
 }
@@ -593,27 +533,19 @@
   font-weight: 600;
   text-transform: none;
   letter-spacing: 0.5px;
-
-  ion-icon {
-    font-size: 22px;
-  }
-
-  &:hover {
-    --box-shadow: 0 8px 32px rgba(46, 125, 50, 0.4);
-  }
+  ion-icon { font-size: 22px; }
+  &:hover { --box-shadow: 0 8px 32px rgba(46, 125, 50, 0.4); }
 }
 
-// ===== RESPONSIVE =====
+// ============================================
+// RESPONSIVE
+// ============================================
 @media (max-width: 1200px) {
-  .info-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .info-cards { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 992px) {
-  .info-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .info-cards { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
@@ -622,94 +554,30 @@
     align-items: flex-start;
     gap: 12px;
   }
-
-  .header-right {
-    width: 100%;
-  }
-
-  .filter-btn, .export-btn {
-    flex: 1;
-  }
-
-  .filter-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .summary-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
+  .header-right { width: 100%; }
+  .filter-btn, .export-btn { flex: 1; }
+  .filter-grid { grid-template-columns: 1fr; }
+  .info-cards { grid-template-columns: 1fr 1fr; }
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
   .table-footer {
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
   }
-
-  .footer-left, .footer-right {
-    justify-content: center;
-  }
-
-  .kehadiran-container {
-    padding: 12px 12px 20px;
-  }
-
-  .col-alasan {
-    min-width: 140px;
-  }
-
-  .col-nama {
-    min-width: 140px;
-  }
-
-  .status-select {
-    min-width: 80px;
-  }
+  .footer-left, .footer-right { justify-content: center; }
+  .kehadiran-container { padding: 12px 12px 20px; }
 }
 
 @media (max-width: 480px) {
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .summary-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .summary-item {
-    padding: 10px 12px;
-  }
-
-  .summary-value {
-    font-size: 17px;
-  }
-
-  .page-title {
-    font-size: 18px;
-  }
-
+  .info-cards { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .summary-item { padding: 10px 12px; }
+  .summary-value { font-size: 17px; }
+  .page-title { font-size: 18px; }
   .kehadiran-table {
     font-size: 12px;
-
-    thead th, tbody td {
-      padding: 8px 8px;
-    }
+    thead th, tbody td { padding: 8px 8px; }
   }
-
-  .col-no {
-    width: 30px;
-  }
-
-  .col-aksi {
-    width: 40px;
-  }
-
-  .avatar-small {
-    width: 26px;
-    height: 26px;
-  }
+  .avatar-small { width: 28px; height: 28px; }
+  .alasan-input { max-width: 100px; }
 }

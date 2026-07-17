@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-.pekerja-content {
+.tanaman-content {
   --background: #f0f5ef;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.pekerja-container {
+.tanaman-container {
   padding: 16px 20px 24px;
-  max-width: 100%;
+  max-width: 100%;  // 🔥 FULL WIDTH
   width: 100%;
   margin: 0 auto;
 }
@@ -114,8 +114,8 @@
   
   &.green { background: linear-gradient(135deg, #2e7d32, #4caf50); }
   &.blue { background: linear-gradient(135deg, #0277bd, #42a5f5); }
-  &.red { background: linear-gradient(135deg, #c62828, #ef5350); }
   &.orange { background: linear-gradient(135deg, #f57c00, #ffa726); }
+  &.purple { background: linear-gradient(135deg, #7b1fa2, #ab47bc); }
 }
 
 .info-card-content {
@@ -180,7 +180,7 @@
 }
 
 // ============================================
-// TABLE
+// TABLE - FULL WIDTH
 // ============================================
 .table-card {
   background: #ffffff;
@@ -239,9 +239,9 @@
   width: 100%;
 }
 
-.pekerja-table {
+.tanaman-table {
   width: 100%;
-  min-width: 900px;
+  min-width: 700px;
   border-collapse: collapse;
   font-size: 13px;
 
@@ -275,67 +275,83 @@
   }
 }
 
+// ===== COLUMN WIDTHS =====
+.col-no { width: 50px; text-align: center; }
+.col-nama { min-width: 160px; }
+.col-varietas { min-width: 120px; }
+.col-lahan { min-width: 100px; }
+.col-luas { min-width: 80px; }
+.col-progress { min-width: 140px; }
+.col-status { min-width: 120px; }
+.col-aksi { min-width: 80px; text-align: center; }
+
 // ============================================
-// PEKERJA INFO
+// TANAMAN INFO
 // ============================================
-.pekerja-info {
+.tanaman-info {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.avatar-small {
+.tanaman-icon {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e8ece7;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  ion-icon { font-size: 16px; color: #ffffff; }
 }
 
-.nama-pekerja {
+.nama-tanaman {
   font-weight: 600;
   color: #1a1a1a;
   font-size: 14px;
 }
 
-.role-badge {
+.varietas-badge {
   display: inline-block;
-  padding: 4px 12px;
-  background: #e8f5e9;
-  color: #2e7d32;
-  border-radius: 20px;
+  padding: 2px 10px;
+  background: #e3f2fd;
+  color: #0277bd;
+  border-radius: 12px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 // ============================================
-// PASSWORD CELL
+// PROGRESS
 // ============================================
-.password-cell {
+.progress-container {
   display: flex;
   align-items: center;
-  gap: 4px;
-  
-  .password-text {
-    font-family: monospace;
-    font-size: 13px;
-    color: #555;
-  }
-  
-  ion-button {
-    --padding-start: 2px;
-    --padding-end: 2px;
-    margin: 0;
-    ion-icon { font-size: 16px; color: #888; }
-    &:hover ion-icon { color: #2e7d32; }
-  }
+  gap: 8px;
+  min-width: 120px;
 }
 
-.email-cell, .alamat-cell {
-  max-width: 150px;
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 4px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 60px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  min-width: 36px;
+  text-align: right;
 }
 
 // ============================================
@@ -349,9 +365,11 @@
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
   
   &.aktif { color: #2e7d32; background: rgba(46, 125, 50, 0.1); }
-  &.tidak { color: #c62828; background: rgba(198, 40, 40, 0.1); }
+  &.panen { color: #f57c00; background: rgba(245, 124, 0, 0.1); }
+  &.selesai { color: #757575; background: rgba(117, 117, 117, 0.1); }
   ion-icon { font-size: 14px; }
 }
 
@@ -361,6 +379,7 @@
 .aksi-buttons {
   display: flex;
   gap: 4px;
+  justify-content: center;
 }
 
 .edit-btn {
@@ -468,12 +487,6 @@
   &:focus { border-color: #2e7d32; }
 }
 
-.password-hint {
-  font-size: 11px;
-  color: #c62828;
-  margin-top: 4px;
-}
-
 .modal-actions {
   display: flex;
   gap: 12px;
@@ -531,19 +544,22 @@
     align-items: stretch;
   }
   .footer-left, .footer-right { justify-content: center; }
-  .pekerja-container { padding: 12px 12px 20px; }
-  .modal-body { padding: 16px; }
+  .tanaman-container { padding: 12px 12px 20px; }
+  .col-progress { min-width: 100px; }
 }
 
 @media (max-width: 480px) {
   .info-cards { grid-template-columns: 1fr; }
   .page-title { font-size: 18px; }
-  .pekerja-table {
+  .tanaman-table {
     font-size: 12px;
     thead th, tbody td { padding: 6px 8px; }
   }
-  .avatar-small { width: 28px; height: 28px; }
-  .email-cell, .alamat-cell { max-width: 80px; }
+  .tanaman-icon { width: 24px; height: 24px; ion-icon { font-size: 12px; } }
   .modal-body { padding: 16px; }
-  .form-group { margin-bottom: 12px; }
+  .progress-container { min-width: 80px; }
+  .progress-text { font-size: 10px; min-width: 28px; }
+  .col-nama { min-width: 120px; }
+  .col-varietas { min-width: 80px; }
+  .col-aksi { min-width: 60px; }
 }

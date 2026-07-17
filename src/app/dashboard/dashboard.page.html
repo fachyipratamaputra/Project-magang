@@ -4,7 +4,9 @@
     <div class="sidebar" [class.open]="isSidebarOpen">
       <div class="sidebar-header">
         <div class="sidebar-logo">
-          <ion-icon name="leaf-outline" class="logo-icon"></ion-icon>
+          <div class="logo-icon-wrapper">
+            <ion-icon name="leaf-outline" class="logo-icon"></ion-icon>
+          </div>
           <span class="logo-text">Petani</span>
         </div>
         <ion-button class="sidebar-close" fill="clear" (click)="toggleSidebar()">
@@ -13,11 +15,14 @@
       </div>
 
       <div class="sidebar-user">
-        <img 
-          [src]="'https://ui-avatars.com/api/?name=' + (user.nama || 'Petani') + '&background=2e7d32&color=fff&size=128&bold=true'" 
-          alt="Avatar"
-          class="sidebar-avatar"
-        />
+        <div class="avatar-wrapper">
+          <img 
+            [src]="'https://ui-avatars.com/api/?name=' + (user.nama || 'Petani') + '&background=2e7d32&color=fff&size=128&bold=true'" 
+            alt="Avatar"
+            class="sidebar-avatar"
+          />
+          <div class="online-status"></div>
+        </div>
         <div class="sidebar-user-info">
           <h4 class="sidebar-username">{{ user.nama || 'Petani Indonesia' }}</h4>
           <p class="sidebar-userrole">🌾 {{ user.role === 'admin' ? 'Administrator' : 'Petani Profesional' }}</p>
@@ -25,55 +30,60 @@
       </div>
 
       <div class="sidebar-menu">
-        <div class="menu-label">OVERVIEW</div>
+        <div class="menu-label">MAIN MENU</div>
         <div class="menu-item" [class.active]="activeMenu === 'beranda'" (click)="goToBeranda()">
-          <ion-icon name="home-outline" class="menu-icon"></ion-icon>
+          <div class="menu-icon-wrapper"><ion-icon name="home-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Beranda</span>
+          <span class="menu-badge" *ngIf="activeMenu === 'beranda'">●</span>
         </div>
         <div class="menu-item" [class.active]="activeMenu === 'profil'" (click)="goToProfile()">
-          <ion-icon name="person-outline" class="menu-icon"></ion-icon>
+          <div class="menu-icon-wrapper"><ion-icon name="person-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Profil</span>
         </div>
 
         <div class="menu-label">MANAJEMEN</div>
-        <div class="menu-item" [class.active]="activeMenu === 'lahan'" (click)="setActiveMenu('lahan')">
-          <ion-icon name="map-outline" class="menu-icon"></ion-icon>
+        <div class="menu-item" [class.active]="activeMenu === 'lahan'" (click)="goToLahan()">
+          <div class="menu-icon-wrapper"><ion-icon name="map-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Lahan Pertanian</span>
         </div>
-        <div class="menu-item" [class.active]="activeMenu === 'tanaman'" (click)="setActiveMenu('tanaman')">
-          <ion-icon name="leaf-outline" class="menu-icon"></ion-icon>
+        <div class="menu-item" [class.active]="activeMenu === 'tanaman'" (click)="goToTanaman()">
+          <div class="menu-icon-wrapper"><ion-icon name="leaf-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Tanaman</span>
         </div>
-        <div class="menu-item" [class.active]="activeMenu === 'panen'" (click)="setActiveMenu('panen')">
-          <ion-icon name="checkmark-done-outline" class="menu-icon"></ion-icon>
+        <div class="menu-item" [class.active]="activeMenu === 'panen'" (click)="goToPanen()">
+          <div class="menu-icon-wrapper"><ion-icon name="checkmark-done-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Panen</span>
         </div>
         <div class="menu-item" [class.active]="activeMenu === 'kehadiran'" (click)="goToKehadiran()">
-          <ion-icon name="calendar-outline" class="menu-icon"></ion-icon>
+          <div class="menu-icon-wrapper"><ion-icon name="calendar-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Kehadiran</span>
         </div>
         <div class="menu-item" [class.active]="activeMenu === 'pekerja'" (click)="goToPekerja()">
-          <ion-icon name="people-outline" class="menu-icon"></ion-icon>
+          <div class="menu-icon-wrapper"><ion-icon name="people-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Pekerja</span>
         </div>
 
         <div class="menu-label">LAINNYA</div>
         <div class="menu-item" [class.active]="activeMenu === 'pembayaran'" (click)="goToPembayaran()">
-          <ion-icon name="wallet-outline" class="menu-icon"></ion-icon>
+          <div class="menu-icon-wrapper"><ion-icon name="wallet-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Pembayaran</span>
         </div>
         <div class="menu-item" [class.active]="activeMenu === 'bantuan'" (click)="setActiveMenu('bantuan')">
-          <ion-icon name="help-circle-outline" class="menu-icon"></ion-icon>
+          <div class="menu-icon-wrapper"><ion-icon name="help-circle-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Bantuan</span>
         </div>
         <div class="menu-item" [class.active]="activeMenu === 'pengaturan'" (click)="setActiveMenu('pengaturan')">
-          <ion-icon name="settings-outline" class="menu-icon"></ion-icon>
+          <div class="menu-icon-wrapper"><ion-icon name="settings-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Pengaturan</span>
         </div>
         <div class="menu-item logout-item" (click)="logout()">
-          <ion-icon name="log-out-outline" class="menu-icon"></ion-icon>
+          <div class="menu-icon-wrapper"><ion-icon name="log-out-outline" class="menu-icon"></ion-icon></div>
           <span class="menu-text">Keluar</span>
         </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span>v1.0.0</span>
       </div>
     </div>
 
@@ -94,10 +104,16 @@
           </div>
         </div>
         <div class="header-right">
-          <ion-button class="notification-btn" fill="clear">
-            <ion-icon name="notifications-outline"></ion-icon>
-            <span class="notification-badge">3</span>
-          </ion-button>
+          <div class="search-bar">
+            <ion-icon name="search-outline" class="search-icon"></ion-icon>
+            <input type="text" placeholder="Cari..." class="search-input">
+          </div>
+          <div class="notification-wrapper">
+            <ion-button class="notification-btn" fill="clear">
+              <ion-icon name="notifications-outline"></ion-icon>
+              <span class="notification-badge">3</span>
+            </ion-button>
+          </div>
           <div class="header-avatar" (click)="goToProfile()">
             <img 
               [src]="'https://ui-avatars.com/api/?name=' + (user.nama || 'Petani') + '&background=2e7d32&color=fff&size=64&bold=true'" 
@@ -111,7 +127,9 @@
       <div class="content-area">
         <!-- LOADING -->
         <div *ngIf="isLoading" class="loading-container">
-          <ion-spinner name="crescent"></ion-spinner>
+          <div class="loading-spinner">
+            <ion-spinner name="crescent"></ion-spinner>
+          </div>
           <p>Memuat data...</p>
         </div>
 
@@ -119,9 +137,12 @@
         <div *ngIf="!isLoading && activeMenu === 'beranda'">
           <!-- GREETING -->
           <div class="greeting-card">
-            <div class="greeting-text">
-              <h2>Selamat Pagi, {{ user.nama || 'Petani' }}! 🌅</h2>
-              <p>Semoga hari ini penuh berkah dalam bertani</p>
+            <div class="greeting-content">
+              <div class="greeting-icon">🌅</div>
+              <div class="greeting-text">
+                <h2>Selamat Pagi, <span class="highlight">{{ user.nama || 'Petani' }}</span>!</h2>
+                <p>Semoga hari ini penuh berkah dalam bertani</p>
+              </div>
             </div>
             <div class="greeting-date">
               <ion-icon name="calendar-outline"></ion-icon>
@@ -129,59 +150,183 @@
             </div>
           </div>
 
-          <!-- STATS -->
+          <!-- STATS CARDS - ROW 1 -->
           <div class="stats-grid">
-            <div class="stat-card stat-card-1" (click)="goToKehadiran()">
-              <div class="stat-icon"><ion-icon name="people-outline"></ion-icon></div>
+            <!-- Total Pekerja -->
+            <div class="stat-card stat-card-1" (click)="goToPekerja()">
+              <div class="stat-card-top">
+                <div class="stat-icon"><ion-icon name="people-outline"></ion-icon></div>
+                <div class="stat-change positive">
+                  <ion-icon name="arrow-up-outline"></ion-icon>
+                  12%
+                </div>
+              </div>
               <div class="stat-info">
                 <h3 class="stat-value">{{ totalPekerja }}</h3>
                 <p class="stat-label">Total Pekerja</p>
               </div>
-              <div class="stat-trend positive">
-                <ion-icon name="arrow-up-outline"></ion-icon>
-                {{ pekerjaAktif }} Aktif
+              <div class="stat-footer">
+                <span class="stat-sub">{{ pekerjaAktif }} Aktif</span>
+                <div class="stat-progress-bar">
+                  <div class="stat-progress-fill" [style.width.%]="(pekerjaAktif/totalPekerja)*100"></div>
+                </div>
               </div>
             </div>
 
+            <!-- Hadir Hari Ini -->
             <div class="stat-card stat-card-2" (click)="goToKehadiran()">
-              <div class="stat-icon"><ion-icon name="checkmark-done-outline"></ion-icon></div>
+              <div class="stat-card-top">
+                <div class="stat-icon"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+                <div class="stat-change positive">
+                  <ion-icon name="arrow-up-outline"></ion-icon>
+                  8%
+                </div>
+              </div>
               <div class="stat-info">
                 <h3 class="stat-value">{{ totalKehadiran }}</h3>
                 <p class="stat-label">Hadir Hari Ini</p>
               </div>
-              <div class="stat-trend positive">
-                <ion-icon name="arrow-up-outline"></ion-icon>
-                {{ kehadiranHadir }} Hadir
+              <div class="stat-footer">
+                <span class="stat-sub">{{ kehadiranHadir }} Hadir</span>
+                <div class="stat-progress-bar">
+                  <div class="stat-progress-fill" [style.width.%]="totalPekerja > 0 ? (kehadiranHadir/totalPekerja)*100 : 0"></div>
+                </div>
               </div>
             </div>
 
+            <!-- Total Gaji -->
             <div class="stat-card stat-card-3" (click)="goToPembayaran()">
-              <div class="stat-icon"><ion-icon name="cash-outline"></ion-icon></div>
+              <div class="stat-card-top">
+                <div class="stat-icon"><ion-icon name="cash-outline"></ion-icon></div>
+                <div class="stat-change positive">
+                  <ion-icon name="arrow-up-outline"></ion-icon>
+                  15%
+                </div>
+              </div>
               <div class="stat-info">
-                <h3 class="stat-value">Rp {{ totalPembayaran.toLocaleString() }}</h3>
+                <h3 class="stat-value">Rp {{ (totalPembayaran / 1000000).toFixed(1) }}Jt</h3>
                 <p class="stat-label">Total Gaji</p>
               </div>
-              <div class="stat-trend positive">
-                <ion-icon name="arrow-up-outline"></ion-icon>
-                {{ pembayaranBerhasil }} Dibayar
+              <div class="stat-footer">
+                <span class="stat-sub">{{ pembayaranBerhasil }} Dibayar</span>
+                <div class="stat-progress-bar">
+                  <div class="stat-progress-fill" [style.width.%]="totalPekerja > 0 ? (pembayaranBerhasil/totalPekerja)*100 : 0"></div>
+                </div>
               </div>
             </div>
 
-            <div class="stat-card stat-card-4" (click)="goToProfile()">
-              <div class="stat-icon"><ion-icon name="star-outline"></ion-icon></div>
+            <!-- Total Lahan -->
+            <div class="stat-card stat-card-4" (click)="goToLahan()">
+              <div class="stat-card-top">
+                <div class="stat-icon"><ion-icon name="map-outline"></ion-icon></div>
+                <div class="stat-change positive">
+                  <ion-icon name="arrow-up-outline"></ion-icon>
+                  {{ totalLahan }}
+                </div>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ totalLahan }}</h3>
+                <p class="stat-label">Total Lahan</p>
+              </div>
+              <div class="stat-footer">
+                <span class="stat-sub">{{ totalLuasLahan }} Ha</span>
+                <div class="stat-progress-bar">
+                  <div class="stat-progress-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STATS CARDS - ROW 2 -->
+          <div class="stats-grid-second">
+            <!-- Total Tanaman -->
+            <div class="stat-card stat-card-5" (click)="goToTanaman()">
+              <div class="stat-card-top">
+                <div class="stat-icon"><ion-icon name="leaf-outline"></ion-icon></div>
+                <div class="stat-change positive">
+                  <ion-icon name="arrow-up-outline"></ion-icon>
+                  {{ totalTanaman }}
+                </div>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ totalTanaman }}</h3>
+                <p class="stat-label">Total Tanaman</p>
+              </div>
+              <div class="stat-footer">
+                <span class="stat-sub">{{ tanamanAktif }} Aktif</span>
+                <div class="stat-progress-bar">
+                  <div class="stat-progress-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Panen -->
+            <div class="stat-card stat-card-6" (click)="goToPanen()">
+              <div class="stat-card-top">
+                <div class="stat-icon"><ion-icon name="checkmark-done-outline"></ion-icon></div>
+                <div class="stat-change positive">
+                  <ion-icon name="arrow-up-outline"></ion-icon>
+                  {{ totalPanen }}
+                </div>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ totalPanen }}</h3>
+                <p class="stat-label">Total Panen</p>
+              </div>
+              <div class="stat-footer">
+                <span class="stat-sub">{{ totalProduksiPanen }} Kg</span>
+                <div class="stat-progress-bar">
+                  <div class="stat-progress-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Role -->
+            <div class="stat-card stat-card-7" (click)="goToProfile()">
+              <div class="stat-card-top">
+                <div class="stat-icon"><ion-icon name="star-outline"></ion-icon></div>
+                <div class="stat-change positive">
+                  <ion-icon name="star-outline"></ion-icon>
+                  4.8
+                </div>
+              </div>
               <div class="stat-info">
                 <h3 class="stat-value">{{ user.role === 'admin' ? 'Admin' : 'Petani' }}</h3>
                 <p class="stat-label">Role Anda</p>
               </div>
-              <div class="stat-trend positive">
-                <ion-icon name="star-outline"></ion-icon>
-                {{ user.nama || 'Petani' }}
+              <div class="stat-footer">
+                <span class="stat-sub">{{ user.nama || 'Petani' }}</span>
+                <div class="stat-progress-bar">
+                  <div class="stat-progress-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pendapatan -->
+            <div class="stat-card stat-card-8" (click)="goToPembayaran()">
+              <div class="stat-card-top">
+                <div class="stat-icon"><ion-icon name="trending-up-outline"></ion-icon></div>
+                <div class="stat-change positive">
+                  <ion-icon name="arrow-up-outline"></ion-icon>
+                  20%
+                </div>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">Rp {{ totalPendapatan }}</h3>
+                <p class="stat-label">Pendapatan</p>
+              </div>
+              <div class="stat-footer">
+                <span class="stat-sub">Bulan Ini</span>
+                <div class="stat-progress-bar">
+                  <div class="stat-progress-fill" style="width: 100%;"></div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- ACTIVITY & CHART -->
           <div class="content-grid">
+            <!-- GRAFIK PANEN -->
             <div class="chart-card">
               <div class="card-header">
                 <div>
@@ -197,6 +342,7 @@
               </div>
             </div>
 
+            <!-- AKTIVITAS TERBARU -->
             <div class="activity-card">
               <div class="card-header">
                 <h4 class="card-title">🕐 Aktivitas Terbaru</h4>
@@ -211,7 +357,10 @@
                   </div>
                   <div class="activity-content">
                     <p class="activity-text">{{ activity.text }}</p>
-                    <span class="activity-time">{{ activity.time }}</span>
+                    <span class="activity-time">
+                      <ion-icon name="time-outline"></ion-icon>
+                      {{ activity.time }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -223,21 +372,20 @@
             <div class="plants-card">
               <div class="card-header">
                 <h4 class="card-title">🌱 Tanaman Populer</h4>
-                <ion-button fill="clear" size="small" class="view-all">
+                <ion-button fill="clear" size="small" class="view-all" (click)="goToTanaman()">
                   Lihat Semua <ion-icon name="chevron-forward-outline"></ion-icon>
                 </ion-button>
               </div>
               <div class="plants-grid">
                 <div class="plant-item" *ngFor="let plant of popularPlants">
-                  <div class="plant-image-wrapper">
-                    <div class="plant-image-placeholder" [style.background]="plant.color">
-                      <ion-icon name="leaf-outline"></ion-icon>
-                    </div>
-                    <div class="plant-status" [class]="plant.status"></div>
+                  <div class="plant-icon-wrapper" [style.background]="plant.color">
+                    <ion-icon name="leaf-outline"></ion-icon>
                   </div>
                   <div class="plant-info">
-                    <h5 class="plant-name">{{ plant.name }}</h5>
-                    <p class="plant-detail">{{ plant.detail }}</p>
+                    <div class="plant-name-row">
+                      <span class="plant-name">{{ plant.name }}</span>
+                      <span class="plant-detail">{{ plant.detail }}</span>
+                    </div>
                     <div class="plant-progress">
                       <div class="progress-bar">
                         <div class="progress-fill" [style.width.%]="plant.progress"></div>
@@ -265,6 +413,44 @@
                     <h5 class="tip-title">{{ tip.title }}</h5>
                     <p class="tip-description">{{ tip.description }}</p>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STATISTIK KEHADIRAN BULAN INI -->
+          <div class="stats-summary-card">
+            <div class="stats-summary-header">
+              <h4 class="stats-summary-title">📊 Statistik Kehadiran Bulan Ini</h4>
+              <span class="stats-summary-period">{{ todayDate | date:'MMMM yyyy' }}</span>
+            </div>
+            <div class="stats-summary-grid">
+              <div class="stats-summary-item">
+                <div class="stats-summary-value" style="color: #2e7d32;">73%</div>
+                <div class="stats-summary-label">Hadir</div>
+                <div class="stats-summary-bar">
+                  <div class="stats-summary-fill" style="width: 73%; background: #2e7d32;"></div>
+                </div>
+              </div>
+              <div class="stats-summary-item">
+                <div class="stats-summary-value" style="color: #f57c00;">12%</div>
+                <div class="stats-summary-label">Izin</div>
+                <div class="stats-summary-bar">
+                  <div class="stats-summary-fill" style="width: 12%; background: #f57c00;"></div>
+                </div>
+              </div>
+              <div class="stats-summary-item">
+                <div class="stats-summary-value" style="color: #c62828;">8%</div>
+                <div class="stats-summary-label">Sakit</div>
+                <div class="stats-summary-bar">
+                  <div class="stats-summary-fill" style="width: 8%; background: #c62828;"></div>
+                </div>
+              </div>
+              <div class="stats-summary-item">
+                <div class="stats-summary-value" style="color: #757575;">7%</div>
+                <div class="stats-summary-label">Alpha</div>
+                <div class="stats-summary-bar">
+                  <div class="stats-summary-fill" style="width: 7%; background: #757575;"></div>
                 </div>
               </div>
             </div>

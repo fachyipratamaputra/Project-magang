@@ -1,0 +1,304 @@
+<ion-content class="lahan-content">
+  <div class="lahan-container">
+    
+    <!-- ===== HEADER ===== -->
+    <div class="page-header">
+      <div class="header-left">
+        <ion-button fill="clear" class="back-btn" (click)="goBack()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <div>
+          <h1 class="page-title">🗺️ Lahan Pertanian</h1>
+          <p class="page-subtitle">Kelola data lahan pertanian</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <ion-button class="filter-btn" fill="outline" (click)="toggleFilter()">
+          <ion-icon name="funnel-outline"></ion-icon>
+          <span>Filter</span>
+        </ion-button>
+        <ion-button class="export-btn" fill="solid" (click)="exportData()">
+          <ion-icon name="download-outline"></ion-icon>
+          <span>Export</span>
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- ===== INFO CARDS ===== -->
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-card-icon green">
+          <ion-icon name="map-outline"></ion-icon>
+        </div>
+        <div class="info-card-content">
+          <span class="info-card-label">Total Lahan</span>
+          <span class="info-card-value">{{ lahan.length }}</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-icon blue">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <div class="info-card-content">
+          <span class="info-card-label">Aktif</span>
+          <span class="info-card-value" style="color: #2e7d32;">{{ lahanAktif }}</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-icon orange">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="info-card-content">
+          <span class="info-card-label">Siap Panen</span>
+          <span class="info-card-value" style="color: #f57c00;">{{ lahanPanen }}</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-icon purple">
+          <ion-icon name="resize-outline"></ion-icon>
+        </div>
+        <div class="info-card-content">
+          <span class="info-card-label">Total Luas</span>
+          <span class="info-card-value">{{ totalLuas }} Ha</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FILTER ===== -->
+    <div class="filter-section" *ngIf="showFilter">
+      <div class="filter-grid">
+        <div class="filter-item">
+          <label class="filter-label">Status</label>
+          <ion-select [(ngModel)]="selectedStatus" interface="action-sheet" (ionChange)="onFilterChange()">
+            <ion-select-option value="semua">Semua</ion-select-option>
+            <ion-select-option value="aktif">Aktif</ion-select-option>
+            <ion-select-option value="panen">Siap Panen</ion-select-option>
+            <ion-select-option value="selesai">Selesai</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">Tanaman</label>
+          <ion-select [(ngModel)]="selectedTanaman" interface="action-sheet" (ionChange)="onFilterChange()">
+            <ion-select-option value="semua">Semua</ion-select-option>
+            <ion-select-option *ngFor="let t of tanamanList" [value]="t">{{ t }}</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LAHAN CARDS ===== -->
+    <div class="lahan-grid">
+      <div class="lahan-card" *ngFor="let item of paginatedData; let i = index">
+        <div class="lahan-image" [style.background]="'linear-gradient(135deg, ' + (item.warna || '#2e7d32') + ', ' + (item.warna2 || '#4caf50') + ')'">
+          <div class="lahan-image-content">
+            <ion-icon name="map-outline" class="lahan-image-icon"></ion-icon>
+            <span class="lahan-image-text">Lahan {{ item.nama }}</span>
+          </div>
+          <div class="lahan-status-badge" [class.aktif]="item.status === 'aktif'" [class.panen]="item.status === 'panen'" [class.selesai]="item.status === 'selesai'">
+            {{ item.status === 'aktif' ? '✅ Aktif' : item.status === 'panen' ? '⏳ Siap Panen' : '✅ Selesai' }}
+          </div>
+        </div>
+        
+        <div class="lahan-body">
+          <div class="lahan-header">
+            <h3 class="lahan-title">🗺️ Lahan {{ item.nama }}</h3>
+            <span class="lahan-luas">{{ item.luas }} Ha</span>
+          </div>
+
+          <div class="lahan-details">
+            <div class="lahan-detail">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ item.lokasi || 'Desa Sukamaju, Kec. X' }}</span>
+            </div>
+            <div class="lahan-detail">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>Dibuka: {{ item.tanggalBuka || '01/01/2024' }}</span>
+            </div>
+          </div>
+
+          <div class="lahan-tanaman">
+            <span class="lahan-tanaman-label">🌱 Tanaman:</span>
+            <div class="lahan-tanaman-list">
+              <span class="lahan-tanaman-item" *ngFor="let t of item.tanaman || []">
+                {{ t.nama }} ({{ t.progress }}%)
+              </span>
+            </div>
+          </div>
+
+          <div class="lahan-progress">
+            <div class="lahan-progress-bar">
+              <div class="lahan-progress-fill" [style.width.%]="item.progress || 0" 
+                   [style.background]="(item.progress || 0) >= 80 ? '#2e7d32' : (item.progress || 0) >= 50 ? '#f57c00' : '#c62828'">
+              </div>
+            </div>
+            <span class="lahan-progress-text">{{ item.progress || 0 }}%</span>
+          </div>
+
+          <div class="lahan-actions">
+            <ion-button fill="clear" size="small" class="edit-btn" (click)="editLahan(item)">
+              <ion-icon name="create-outline"></ion-icon>
+              Edit
+            </ion-button>
+            <ion-button fill="clear" size="small" class="hapus-btn" (click)="hapusLahan(item)">
+              <ion-icon name="trash-outline"></ion-icon>
+              Hapus
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TABLE FOOTER ===== -->
+    <div class="table-footer">
+      <div class="footer-left">
+        <span>Rows per page:</span>
+        <ion-select [(ngModel)]="rowsPerPage" interface="action-sheet" (ionChange)="onRowsPerPageChange()">
+          <ion-select-option value="4">4</ion-select-option>
+          <ion-select-option value="8">8</ion-select-option>
+          <ion-select-option value="12">12</ion-select-option>
+        </ion-select>
+        <span>{{ getPaginationText() }}</span>
+      </div>
+      <div class="footer-right">
+        <ion-button fill="clear" size="small" (click)="prevPage()" [disabled]="currentPage === 1">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+        <span class="page-info">{{ currentPage }} - {{ totalPages }} of {{ totalPages }}</span>
+        <ion-button fill="clear" size="small" (click)="nextPage()" [disabled]="currentPage === totalPages">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- ===== TOMBOL TAMBAH ===== -->
+    <div class="tambah-section">
+      <ion-button class="tambah-btn-full" expand="block" (click)="openTambahModal()">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Tambah Lahan Baru
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- ===== MODAL TAMBAH/EDIT LAHAN ===== -->
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ isEditing ? 'Edit Lahan' : 'Tambah Lahan' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="modal-content">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Nama Lahan <span class="required">*</span></label>
+          <ion-input 
+            type="text" 
+            placeholder="Contoh: Lahan A, Lahan Sawah, dll"
+            [(ngModel)]="formData.nama"
+            class="form-input"
+          ></ion-input>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Luas Lahan (Ha) <span class="required">*</span></label>
+          <ion-input 
+            type="number" 
+            placeholder="Masukkan luas lahan"
+            [(ngModel)]="formData.luas"
+            class="form-input"
+            step="0.1"
+            min="0"
+          ></ion-input>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lokasi</label>
+          <ion-input 
+            type="text" 
+            placeholder="Masukkan lokasi lahan"
+            [(ngModel)]="formData.lokasi"
+            class="form-input"
+          ></ion-input>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tanggal Buka</label>
+          <ion-input 
+            type="date" 
+            [(ngModel)]="formData.tanggalBuka"
+            class="form-input"
+          ></ion-input>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Progress (%) <span class="required">*</span></label>
+          <ion-input 
+            type="number" 
+            placeholder="Masukkan progress (0-100)"
+            [(ngModel)]="formData.progress"
+            class="form-input"
+            min="0"
+            max="100"
+          ></ion-input>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Status <span class="required">*</span></label>
+          <ion-select 
+            [(ngModel)]="formData.status" 
+            interface="action-sheet"
+            class="form-select"
+            placeholder="Pilih status"
+          >
+            <ion-select-option value="aktif">Aktif</ion-select-option>
+            <ion-select-option value="panen">Siap Panen</ion-select-option>
+            <ion-select-option value="selesai">Selesai</ion-select-option>
+          </ion-select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Warna Lahan</label>
+          <ion-select 
+            [(ngModel)]="formData.warna" 
+            interface="action-sheet"
+            class="form-select"
+            placeholder="Pilih warna"
+          >
+            <ion-select-option value="#2e7d32">Hijau</ion-select-option>
+            <ion-select-option value="#1a472a">Hijau Tua</ion-select-option>
+            <ion-select-option value="#f57c00">Oranye</ion-select-option>
+            <ion-select-option value="#c62828">Merah</ion-select-option>
+            <ion-select-option value="#0277bd">Biru</ion-select-option>
+            <ion-select-option value="#7b1fa2">Ungu</ion-select-option>
+            <ion-select-option value="#4a148c">Ungu Tua</ion-select-option>
+            <ion-select-option value="#00695c">Teal</ion-select-option>
+          </ion-select>
+        </div>
+
+        <div class="modal-actions">
+          <ion-button class="cancel-modal-btn" fill="outline" (click)="closeModal()">
+            Batal
+          </ion-button>
+          <ion-button 
+            class="submit-modal-btn" 
+            (click)="simpanLahan()"
+            [disabled]="!formData.nama || !formData.luas || !formData.progress || !formData.status"
+          >
+            <ion-icon name="save-outline" slot="start"></ion-icon>
+            {{ isEditing ? 'Update' : 'Simpan' }}
+          </ion-button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

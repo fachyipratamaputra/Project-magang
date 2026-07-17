@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ApiService } from '../services/api';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
@@ -12,7 +15,9 @@ import { ApiService } from '../services/api';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage implements OnInit, AfterViewInit {
+  @ViewChild('panenChart') panenChartRef!: ElementRef;
+
   // ===== SIDEBAR =====
   isSidebarOpen: boolean = false;
   activeMenu: string = 'beranda';
@@ -22,13 +27,22 @@ export class DashboardPage implements OnInit {
   user: any = {};
   isLoading: boolean = true;
   
-  // ===== STATISTIK =====
+  // ===== STATISTIK PEKERJA =====
   totalPekerja: number = 0;
   pekerjaAktif: number = 0;
   totalKehadiran: number = 0;
   kehadiranHadir: number = 0;
   totalPembayaran: number = 0;
   pembayaranBerhasil: number = 0;
+
+  // ===== STATISTIK LAHAN & TANAMAN =====
+  totalLahan: number = 5;
+  totalLuasLahan: number = 6.5;
+  totalTanaman: number = 8;
+  tanamanAktif: number = 6;
+  totalPanen: number = 8;
+  totalProduksiPanen: number = 1850;
+  totalPendapatan: string = '25.5 Jt';
 
   // ===== DATA STATIS =====
   activities = [
@@ -69,7 +83,68 @@ export class DashboardPage implements OnInit {
     this.loadDashboard();
   }
 
-  // ===== LOAD DATA DARI API =====
+  ngAfterViewInit() {
+    this.initChart();
+  }
+
+  initChart() {
+    if (this.panenChartRef) {
+      const ctx = this.panenChartRef.nativeElement.getContext('2d');
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+          datasets: [
+            {
+              label: 'Hasil Panen (kg)',
+              data: [120, 190, 170, 220, 280, 250],
+              borderColor: '#2e7d32',
+              backgroundColor: 'rgba(46, 125, 50, 0.1)',
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: '#2e7d32',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: { size: 10 },
+                color: '#999'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: { size: 10 },
+                color: '#999'
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // ===== LOAD DATA =====
   loadDashboard() {
     this.isLoading = true;
     
@@ -93,16 +168,16 @@ export class DashboardPage implements OnInit {
         this.isLoading = false;
         // Fallback data
         this.totalPekerja = 15;
-        this.pekerjaAktif = 12;
-        this.totalKehadiran = 10;
-        this.kehadiranHadir = 8;
-        this.totalPembayaran = 24500000;
-        this.pembayaranBerhasil = 11;
+        this.pekerjaAktif = 13;
+        this.totalKehadiran = 0;
+        this.kehadiranHadir = 0;
+        this.totalPembayaran = 25500000;
+        this.pembayaranBerhasil = 7;
       }
     });
   }
 
-  // ===== SIDEBAR =====
+  // ===== NAVIGASI =====
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
@@ -114,16 +189,16 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  setActiveMenu(menu: string) {
-    this.activeMenu = menu;
-    if (window.innerWidth < 1024) {
-      this.isSidebarOpen = false;
-    }
+  goToLahan() {
+    this.router.navigate(['/lahan']);
   }
 
-  // ===== NAVIGASI =====
-  goToProfile() {
-    this.router.navigate(['/profile']);
+  goToTanaman() {
+    this.router.navigate(['/tanaman']);
+  }
+
+  goToPanen() {
+    this.router.navigate(['/panen']);
   }
 
   goToKehadiran() {
@@ -138,7 +213,17 @@ export class DashboardPage implements OnInit {
     this.router.navigate(['/pembayaran']);
   }
 
-  // ===== HELPER =====
+  goToProfile() {
+    this.router.navigate(['/profile']);
+  }
+
+  setActiveMenu(menu: string) {
+    this.activeMenu = menu;
+    if (window.innerWidth < 1024) {
+      this.isSidebarOpen = false;
+    }
+  }
+
   getPageTitle(): string {
     const titles: { [key: string]: string } = {
       'beranda': 'Beranda',

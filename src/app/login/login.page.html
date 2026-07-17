@@ -1,28 +1,34 @@
 <ion-content class="login-content">
-  <!-- Background dengan gradien -->
+  <!-- Background Gradient -->
   <div class="background-gradient">
     <div class="circle circle-1"></div>
     <div class="circle circle-2"></div>
     <div class="circle circle-3"></div>
+    <div class="circle circle-4"></div>
   </div>
 
   <div class="container">
-    <!-- Header dengan animasi -->
+    <!-- Header -->
     <div class="header animate-slide-down">
       <div class="logo-wrapper">
         <div class="logo-background">
           <ion-icon name="leaf-outline" class="logo-icon"></ion-icon>
         </div>
+        <!-- Status Koneksi -->
+        <div class="connection-dot" [class.success]="connectionStatus.includes('terhubung')" [class.error]="connectionStatus.includes('Gagal')">
+          <span class="dot"></span>
+          <span class="dot-text">{{ connectionStatus.includes('terhubung') ? 'Online' : connectionStatus.includes('Gagal') ? 'Offline' : '...' }}</span>
+        </div>
       </div>
       
       <div class="header-text">
         <h1 class="app-title">Petani</h1>
-        <h2 class="welcome-text">Selamat Datang Kembali! 🌿</h2>
+        <h2 class="welcome-text">Selamat Datang Kembali! 🥰</h2>
         <p class="sub-text">Masuk ke akun Anda untuk mengakses<br>layanan pertanian terbaik</p>
       </div>
     </div>
 
-    <!-- Card Login dengan Glassmorphism -->
+    <!-- Card Login -->
     <div class="login-card animate-slide-up">
       <div class="card-header">
         <div class="header-icon">
@@ -34,7 +40,6 @@
 
       <!-- Form Login -->
       <form (ngSubmit)="onLogin()" class="login-form">
-        <!-- Username -->
         <div class="input-group">
           <div class="input-icon">
             <ion-icon name="person-outline"></ion-icon>
@@ -54,7 +59,6 @@
           </div>
         </div>
 
-        <!-- Password -->
         <div class="input-group">
           <div class="input-icon">
             <ion-icon name="lock-closed-outline"></ion-icon>
@@ -81,23 +85,23 @@
           </div>
         </div>
 
-        <!-- Lupa Password -->
         <div class="forgot-password">
           <a (click)="forgotPassword()">Lupa password?</a>
         </div>
 
-        <!-- Tombol Login -->
-        <ion-button 
-          expand="block" 
-          class="login-btn" 
-          type="submit"
-          [disabled]="!username || !password"
-        >
-          <span class="btn-text">Masuk Sekarang</span>
-          <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
-        </ion-button>
+        <!-- 🔥 TOMBOL MASUK - DI TENGAH -->
+        <div class="button-center">
+          <ion-button 
+            class="login-btn" 
+            type="submit"
+            [disabled]="!username || !password || isLoading"
+          >
+            <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+            <span *ngIf="!isLoading" class="btn-text">Masuk Sekarang</span>
+            <ion-icon *ngIf="!isLoading" slot="end" name="arrow-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
 
-        <!-- Register Link -->
         <div class="register-link">
           <span class="register-text">Belum punya akun? </span>
           <span class="register-link-text" (click)="goToRegister()">
@@ -106,23 +110,25 @@
           </span>
         </div>
 
-        <!-- Divider -->
         <div class="divider">
           <span class="divider-line"></span>
-          <span class="divider-text">Atau lanjutkan dengan</span>
+          <span class="divider-text">ATAU LANJUTKAN DENGAN</span>
           <span class="divider-line"></span>
         </div>
 
         <!-- Social Login -->
         <div class="social-login">
           <ion-button class="social-btn google-btn" (click)="onLoginGoogle()">
-            <ion-icon slot="start" name="logo-google"></ion-icon>
-            Google
+            <div class="social-icon-wrapper google-icon">
+              <ion-icon name="logo-google"></ion-icon>
+            </div>
+            <span class="social-text">Google</span>
           </ion-button>
-          
           <ion-button class="social-btn facebook-btn" (click)="onLoginFacebook()">
-            <ion-icon slot="start" name="logo-facebook"></ion-icon>
-            Facebook
+            <div class="social-icon-wrapper facebook-icon">
+              <ion-icon name="logo-facebook"></ion-icon>
+            </div>
+            <span class="social-text">Facebook</span>
           </ion-button>
         </div>
       </form>
@@ -130,7 +136,10 @@
 
     <!-- Footer -->
     <div class="footer">
-      <p class="footer-text">© 2026 Petani App. All rights reserved.</p>
+      <div class="footer-status">
+        <span class="status-indicator" [class.success]="connectionStatus.includes('terhubung')" [class.error]="connectionStatus.includes('Gagal')"></span>
+        <span class="footer-text">© 2026 Petani App. All rights reserved.</span>
+      </div>
     </div>
   </div>
 </ion-content>

@@ -1,6 +1,7 @@
 <ion-content class="pekerja-content">
   <div class="pekerja-container">
-    <!-- Header -->
+    
+    <!-- ===== HEADER ===== -->
     <div class="page-header">
       <div class="header-left">
         <ion-button fill="clear" class="back-btn" (click)="goBack()">
@@ -23,29 +24,47 @@
       </div>
     </div>
 
-    <!-- Info Petani -->
-    <div class="info-card">
-      <div class="info-grid">
-        <div class="info-item">
-          <span class="info-label">Nama Petani</span>
-          <span class="info-value">{{ namaPetani }}</span>
+    <!-- ===== INFO CARDS ===== -->
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-card-icon green">
+          <ion-icon name="people-outline"></ion-icon>
         </div>
-        <div class="info-item">
-          <span class="info-label">Total Pekerja</span>
-          <span class="info-value">{{ pekerja.length }}</span>
+        <div class="info-card-content">
+          <span class="info-card-label">Total Pekerja</span>
+          <span class="info-card-value">{{ pekerja.length }}</span>
         </div>
-        <div class="info-item">
-          <span class="info-label">Pekerja Aktif</span>
-          <span class="info-value" style="color: #2e7d32;">{{ pekerjaAktif }}</span>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon blue">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
         </div>
-        <div class="info-item">
-          <span class="info-label">Pekerja Tidak Aktif</span>
-          <span class="info-value" style="color: #c62828;">{{ pekerjaTidakAktif }}</span>
+        <div class="info-card-content">
+          <span class="info-card-label">Aktif</span>
+          <span class="info-card-value" style="color: #2e7d32;">{{ pekerjaAktif }}</span>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon red">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </div>
+        <div class="info-card-content">
+          <span class="info-card-label">Tidak Aktif</span>
+          <span class="info-card-value" style="color: #c62828;">{{ pekerjaTidakAktif }}</span>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon orange">
+          <ion-icon name="cash-outline"></ion-icon>
+        </div>
+        <div class="info-card-content">
+          <span class="info-card-label">Total Gaji</span>
+          <span class="info-card-value">Rp {{ totalGaji }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Filter -->
+    <!-- ===== FILTER ===== -->
     <div class="filter-section" *ngIf="showFilter">
       <div class="filter-grid">
         <div class="filter-item">
@@ -70,66 +89,67 @@
       </div>
     </div>
 
-    <!-- Tabel Pekerja -->
+    <!-- ===== TABLE ===== -->
     <div class="table-card">
       <div class="table-header">
-        <h4 class="table-title">📋 Daftar Pekerja</h4>
-        <div class="table-actions">
-          <span class="total-data">Menampilkan {{ filteredPekerja.length }} dari {{ pekerja.length }} pekerja</span>
-          <ion-button class="tambah-btn" fill="solid" size="small" (click)="tambahPekerja()">
-            <ion-icon name="add-outline"></ion-icon>
-            Tambah
-          </ion-button>
+        <div class="table-title-wrapper">
+          <h4 class="table-title">📋 Daftar Pekerja</h4>
+          <span class="table-subtitle">Menampilkan {{ filteredPekerja.length }} dari {{ pekerja.length }} pekerja</span>
         </div>
+        <!-- 🔥 TOMBOL TAMBAH - PAKAI ID UNTUK TRIGGER -->
+        <ion-button id="open-modal-btn" class="tambah-btn" fill="solid" size="small">
+          <ion-icon name="add-outline"></ion-icon>
+          Tambah
+        </ion-button>
       </div>
 
       <div class="table-wrapper">
         <table class="pekerja-table">
           <thead>
             <tr>
-              <th class="col-no">No</th>
-              <th class="col-nama">Nama</th>
-              <th class="col-posisi">Posisi</th>
-              <th class="col-email">Email</th>
-              <th class="col-password">Password</th>
-              <th class="col-telepon">Telepon</th>
-              <th class="col-alamat">Alamat</th>
-              <th class="col-status">Status</th>
-              <th class="col-aksi">Aksi</th>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Posisi</th>
+              <th>Email</th>
+              <th>Password</th>
+              <th>Telepon</th>
+              <th>Alamat</th>
+              <th>Status</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of paginatedData; let i = index">
-              <td class="col-no">{{ i + 1 + (currentPage - 1) * rowsPerPage }}</td>
-              <td class="col-nama">
+              <td>{{ i + 1 + (currentPage - 1) * rowsPerPage }}</td>
+              <td>
                 <div class="pekerja-info">
                   <img 
-                    [src]="item.avatar || 'https://ui-avatars.com/api/?name=' + item.nama + '&background=2e7d32&color=fff&size=64&bold=true'" 
+                    [src]="'https://ui-avatars.com/api/?name=' + item.nama + '&background=2e7d32&color=fff&size=64&bold=true'"
                     alt="Avatar"
                     class="avatar-small"
                   />
-                  <span class="nama-pekerja" [class.tidak-aktif]="!item.aktif">{{ item.nama }}</span>
+                  <span class="nama-pekerja">{{ item.nama }}</span>
                 </div>
               </td>
-              <td class="col-posisi">
-                <span class="posisi-badge">{{ item.posisi }}</span>
+              <td><span class="role-badge">{{ item.posisi }}</span></td>
+              <td class="email-cell">{{ item.email }}</td>
+              <td>
+                <div class="password-cell">
+                  <span class="password-text">{{ item.showPassword ? item.password : '••••••••' }}</span>
+                  <ion-button fill="clear" size="small" (click)="togglePassword(item)">
+                    <ion-icon [name]="item.showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                  </ion-button>
+                </div>
               </td>
-              <td class="col-email">{{ item.email }}</td>
-              <td class="col-password">
-                <span class="password-text">{{ item.password }}</span>
-                <ion-button fill="clear" size="small" class="lihat-password" (click)="togglePassword(item)">
-                  <ion-icon [name]="item.showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
-                </ion-button>
-              </td>
-              <td class="col-telepon">{{ item.telepon }}</td>
-              <td class="col-alamat">{{ item.alamat }}</td>
-              <td class="col-status">
+              <td>{{ item.telepon }}</td>
+              <td class="alamat-cell">{{ item.alamat }}</td>
+              <td>
                 <span class="status-badge" [class.aktif]="item.aktif" [class.tidak]="!item.aktif">
                   <ion-icon [name]="item.aktif ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
                   {{ item.aktif ? 'Aktif' : 'Tidak Aktif' }}
                 </span>
               </td>
-              <td class="col-aksi">
+              <td>
                 <div class="aksi-buttons">
                   <ion-button fill="clear" size="small" class="edit-btn" (click)="editPekerja(item)">
                     <ion-icon name="create-outline"></ion-icon>
@@ -144,7 +164,6 @@
         </table>
       </div>
 
-      <!-- Footer Tabel -->
       <div class="table-footer">
         <div class="footer-left">
           <span>Rows per page:</span>
@@ -167,11 +186,12 @@
         </div>
       </div>
     </div>
+
   </div>
 </ion-content>
 
-<!-- Modal Tambah/Edit Pekerja -->
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+<!-- ===== 🔥 MODAL TAMBAH/EDIT PEKERJA - PAKAI TRIGGER ID ===== -->
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()" trigger="open-modal-btn">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -185,8 +205,9 @@
     </ion-header>
     <ion-content class="modal-content">
       <div class="modal-body">
+        
         <div class="form-group">
-          <label class="form-label">Nama Lengkap *</label>
+          <label class="form-label">Nama Lengkap <span class="required">*</span></label>
           <ion-input 
             type="text" 
             placeholder="Masukkan nama lengkap"
@@ -196,7 +217,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Posisi *</label>
+          <label class="form-label">Posisi <span class="required">*</span></label>
           <ion-select 
             [(ngModel)]="formData.posisi" 
             interface="action-sheet"
@@ -212,7 +233,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Email *</label>
+          <label class="form-label">Email <span class="required">*</span></label>
           <ion-input 
             type="email" 
             placeholder="Masukkan email"
@@ -222,10 +243,10 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Password *</label>
+          <label class="form-label">Password <span class="required">*</span></label>
           <ion-input 
             [type]="showFormPassword ? 'text' : 'password'"
-            placeholder="Masukkan password"
+            placeholder="Masukkan password (min 6 karakter)"
             [(ngModel)]="formData.password"
             class="form-input"
           >
