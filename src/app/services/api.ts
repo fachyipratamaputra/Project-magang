@@ -22,6 +22,7 @@ export class ApiService {
     return this.token || localStorage.getItem('token') || '';
   }
 
+  // 🔥 CLEAR TOKEN - HAPUS SEMUA DATA SESSION
   clearToken(): void {
     this.token = '';
     localStorage.removeItem('token');
@@ -35,40 +36,29 @@ export class ApiService {
     });
   }
 
-  // ==========================================
-  // 🔥 TEST KONEKSI
-  // ==========================================
+  // ===== TEST KONEKSI =====
   testConnection(): Observable<any> {
     return this.http.get(`${this.baseUrl}/test`);
   }
 
-  // ==========================================
-  // 🔐 AUTH (LOGIN, REGISTER, LOGOUT)
-  // ==========================================
-
-  // 🔥 LOGIN
+  // ===== AUTH =====
   login(data: { username: string, password: string }): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/login`, data);
   }
 
-  // 🔥 REGISTER
   register(data: { nama: string, username: string, email: string, password: string }): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/register`, data);
   }
 
-  // 🔥 CEK USERNAME (untuk validasi real-time)
   checkUsername(username: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/auth/check-username?username=${username}`);
   }
 
-  // 🔥 LOGOUT
   logout(): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/logout`, {}, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 👥 USERS
-  // ==========================================
+  // ===== USERS =====
   getUsers(): Observable<any> {
     return this.http.get(`${this.baseUrl}/users`, { headers: this.getHeaders() });
   }
@@ -89,9 +79,7 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/users/${id}`, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 👨‍🌾 PEKERJA
-  // ==========================================
+  // ===== PEKERJA =====
   getPekerja(): Observable<any> {
     return this.http.get(`${this.baseUrl}/pekerja`, { headers: this.getHeaders() });
   }
@@ -112,9 +100,7 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/pekerja/${id}`, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 📋 KEHADIRAN
-  // ==========================================
+  // ===== KEHADIRAN =====
   getKehadiran(tanggal?: string): Observable<any> {
     const url = tanggal ? `${this.baseUrl}/kehadiran?tanggal=${tanggal}` : `${this.baseUrl}/kehadiran`;
     return this.http.get(url, { headers: this.getHeaders() });
@@ -144,9 +130,7 @@ export class ApiService {
     return this.http.get(url, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 💰 PEMBAYARAN
-  // ==========================================
+  // ===== PEMBAYARAN =====
   getPembayaran(periode?: string): Observable<any> {
     const url = periode ? `${this.baseUrl}/pembayaran?periode=${periode}` : `${this.baseUrl}/pembayaran`;
     return this.http.get(url, { headers: this.getHeaders() });
@@ -180,16 +164,12 @@ export class ApiService {
     return this.http.get(url, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 📊 DASHBOARD
-  // ==========================================
+  // ===== DASHBOARD =====
   getDashboard(): Observable<any> {
     return this.http.get(`${this.baseUrl}/dashboard`, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 🗺️ LAHAN
-  // ==========================================
+  // ===== LAHAN =====
   getLahan(): Observable<any> {
     return this.http.get(`${this.baseUrl}/lahan`, { headers: this.getHeaders() });
   }
@@ -210,9 +190,7 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/lahan/${id}`, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 🌱 TANAMAN
-  // ==========================================
+  // ===== TANAMAN =====
   getTanaman(): Observable<any> {
     return this.http.get(`${this.baseUrl}/tanaman`, { headers: this.getHeaders() });
   }
@@ -233,9 +211,7 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/tanaman/${id}`, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 🌾 PANEN
-  // ==========================================
+  // ===== PANEN =====
   getPanen(): Observable<any> {
     return this.http.get(`${this.baseUrl}/panen`, { headers: this.getHeaders() });
   }

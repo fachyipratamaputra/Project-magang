@@ -72,7 +72,7 @@
         </div>
         <div class="info-card-content">
           <span class="info-card-label">Total Pekerja</span>
-          <span class="info-card-value">15</span>
+          <span class="info-card-value">{{ pekerja.length }}</span>
         </div>
       </div>
 
@@ -82,7 +82,7 @@
         </div>
         <div class="info-card-content">
           <span class="info-card-label">Kehadiran</span>
-          <span class="info-card-value" style="color: #2e7d32;">62%</span>
+          <span class="info-card-value" style="color: #2e7d32;">{{ hitungPersentase('hadir') }}%</span>
         </div>
       </div>
     </div>
@@ -127,7 +127,8 @@
           <h4 class="table-title">📋 Daftar Kehadiran Pekerja</h4>
           <span class="table-subtitle">Menampilkan {{ filteredPekerja.length }} dari {{ pekerja.length }} pekerja</span>
         </div>
-        <ion-button class="tambah-btn" fill="solid" size="small" (click)="tambahKaryawan()">
+        <!-- 🔥 TOMBOL TAMBAH - sekarang buka modal, bukan alert -->
+        <ion-button class="tambah-btn" fill="solid" size="small" (click)="openModal()">
           <ion-icon name="add-outline"></ion-icon>
           Tambah
         </ion-button>
@@ -265,3 +266,107 @@
 
   </div>
 </ion-content>
+
+<!-- ========================================== -->
+<!-- 🔥 MODAL TAMBAH KARYAWAN                  -->
+<!-- ========================================== -->
+<ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Tambah Karyawan</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="modal-content">
+      <div class="modal-body">
+
+        <!-- Nama Lengkap -->
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap <span class="required">*</span></label>
+          <ion-input 
+            type="text" 
+            placeholder="Masukkan nama lengkap"
+            [(ngModel)]="formData.nama"
+            class="form-input"
+          ></ion-input>
+        </div>
+
+        <!-- Posisi -->
+        <div class="form-group">
+          <label class="form-label">Posisi <span class="required">*</span></label>
+          <ion-select 
+            [(ngModel)]="formData.posisi" 
+            interface="action-sheet"
+            class="form-select"
+            placeholder="Pilih posisi"
+          >
+            <ion-select-option value="Kepala Lahan">Kepala Lahan</ion-select-option>
+            <ion-select-option value="Petani">Petani</ion-select-option>
+            <ion-select-option value="Penyemprot">Penyemprot</ion-select-option>
+            <ion-select-option value="Pemanen">Pemanen</ion-select-option>
+            <ion-select-option value="Lainnya">Lainnya</ion-select-option>
+          </ion-select>
+        </div>
+
+        <!-- Status Kehadiran Awal -->
+        <div class="form-group">
+          <label class="form-label">Status Kehadiran</label>
+          <ion-select 
+            [(ngModel)]="formData.status" 
+            interface="action-sheet"
+            class="form-select"
+          >
+            <ion-select-option value="hadir">Hadir</ion-select-option>
+            <ion-select-option value="izin">Izin</ion-select-option>
+            <ion-select-option value="sakit">Sakit</ion-select-option>
+            <ion-select-option value="alpha">Alpha</ion-select-option>
+          </ion-select>
+        </div>
+
+        <!-- Alasan (kalau status bukan hadir) -->
+        <div class="form-group" *ngIf="formData.status !== 'hadir'">
+          <label class="form-label">Alasan</label>
+          <ion-input 
+            type="text" 
+            placeholder="Masukkan alasan"
+            [(ngModel)]="formData.alasan"
+            class="form-input"
+          ></ion-input>
+        </div>
+
+        <!-- Status Aktif -->
+        <div class="form-group">
+          <label class="form-label">Status Aktif</label>
+          <ion-select 
+            [(ngModel)]="formData.aktif" 
+            interface="action-sheet"
+            class="form-select"
+          >
+            <ion-select-option [value]="true">Aktif</ion-select-option>
+            <ion-select-option [value]="false">Tidak Aktif</ion-select-option>
+          </ion-select>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="modal-actions">
+          <ion-button class="cancel-modal-btn" fill="outline" (click)="closeModal()">
+            Batal
+          </ion-button>
+          <ion-button 
+            class="submit-modal-btn" 
+            (click)="simpanKaryawan()"
+            [disabled]="!formData.nama || !formData.posisi"
+          >
+            <ion-icon name="save-outline" slot="start"></ion-icon>
+            Simpan
+          </ion-button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

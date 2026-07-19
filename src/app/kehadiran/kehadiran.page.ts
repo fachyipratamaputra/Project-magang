@@ -29,6 +29,16 @@ export class KehadiranPage implements OnInit {
   totalSakit: number = 0;
   totalAlpha: number = 0;
 
+  // ===== 🔥 MODAL TAMBAH KARYAWAN =====
+  isModalOpen: boolean = false;
+  formData: any = {
+    nama: '',
+    posisi: '',
+    status: 'hadir',
+    alasan: '-',
+    aktif: true
+  };
+
   constructor(private router: Router) {
     this.selectedTanggal = new Date().toISOString().split('T')[0];
   }
@@ -133,7 +143,57 @@ export class KehadiranPage implements OnInit {
     this.filterData();
   }
 
-  tambahKaryawan() { alert('Fitur tambah karyawan segera hadir!'); }
+  // ============================================
+  // 🔥 MODAL - TAMBAH KARYAWAN
+  // ============================================
+  openModal() {
+    this.formData = {
+      nama: '',
+      posisi: '',
+      status: 'hadir',
+      alasan: '-',
+      aktif: true
+    };
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+  }
+
+  simpanKaryawan() {
+    // Validasi
+    if (!this.formData.nama || !this.formData.posisi) {
+      alert('⚠️ Harap isi Nama dan Posisi terlebih dahulu!');
+      return;
+    }
+
+    // Cek duplikat nama
+    const namaExists = this.pekerja.some(
+      p => p.nama.toLowerCase() === this.formData.nama.toLowerCase()
+    );
+    if (namaExists) {
+      alert('⚠️ Nama karyawan sudah terdaftar!');
+      return;
+    }
+
+    // Kalau status hadir, alasan otomatis '-'
+    if (this.formData.status === 'hadir') {
+      this.formData.alasan = '-';
+    } else if (!this.formData.alasan) {
+      this.formData.alasan = '-';
+    }
+
+    const karyawanBaru = { ...this.formData };
+    this.pekerja.push(karyawanBaru);
+
+    alert(`✅ ${karyawanBaru.nama} berhasil ditambahkan!`);
+
+    this.closeModal();
+    this.filterData();
+    this.hitungStatistik();
+    this.calculatePagination();
+  }
 
   hapusKaryawan(item: any) {
     if (confirm(`Apakah Anda yakin ingin menghapus ${item.nama}?`)) {

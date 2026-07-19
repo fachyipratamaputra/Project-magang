@@ -14,7 +14,7 @@
         <div class="logo-background">
           <ion-icon name="leaf-outline" class="logo-icon"></ion-icon>
         </div>
-        <!-- Status Koneksi -->
+        <!-- Status Koneksi - Icon Kecil -->
         <div class="connection-dot" [class.success]="connectionStatus.includes('terhubung')" [class.error]="connectionStatus.includes('Gagal')">
           <span class="dot"></span>
           <span class="dot-text">{{ connectionStatus.includes('terhubung') ? 'Online' : connectionStatus.includes('Gagal') ? 'Offline' : '...' }}</span>
@@ -89,7 +89,7 @@
           <a (click)="forgotPassword()">Lupa password?</a>
         </div>
 
-        <!-- 🔥 TOMBOL MASUK - DI TENGAH -->
+        <!-- Tombol Masuk - DI TENGAH -->
         <div class="button-center">
           <ion-button 
             class="login-btn" 
@@ -118,13 +118,13 @@
 
         <!-- Social Login -->
         <div class="social-login">
-          <ion-button class="social-btn google-btn" (click)="onLoginGoogle()">
+          <ion-button class="social-btn google-btn" (click)="onLoginGoogle()" [disabled]="isLoading">
             <div class="social-icon-wrapper google-icon">
               <ion-icon name="logo-google"></ion-icon>
             </div>
             <span class="social-text">Google</span>
           </ion-button>
-          <ion-button class="social-btn facebook-btn" (click)="onLoginFacebook()">
+          <ion-button class="social-btn facebook-btn" (click)="onLoginFacebook()" [disabled]="isLoading">
             <div class="social-icon-wrapper facebook-icon">
               <ion-icon name="logo-facebook"></ion-icon>
             </div>

@@ -18,24 +18,19 @@ Chart.register(...registerables);
 export class DashboardPage implements OnInit, AfterViewInit {
   @ViewChild('panenChart') panenChartRef!: ElementRef;
 
-  // ===== SIDEBAR =====
   isSidebarOpen: boolean = false;
   activeMenu: string = 'beranda';
   todayDate: string = '';
   
-  // ===== USER & DATA =====
   user: any = {};
   isLoading: boolean = true;
   
-  // ===== STATISTIK PEKERJA =====
   totalPekerja: number = 0;
   pekerjaAktif: number = 0;
   totalKehadiran: number = 0;
   kehadiranHadir: number = 0;
   totalPembayaran: number = 0;
   pembayaranBerhasil: number = 0;
-
-  // ===== STATISTIK LAHAN & TANAMAN =====
   totalLahan: number = 5;
   totalLuasLahan: number = 6.5;
   totalTanaman: number = 8;
@@ -44,7 +39,6 @@ export class DashboardPage implements OnInit, AfterViewInit {
   totalProduksiPanen: number = 1850;
   totalPendapatan: string = '25.5 Jt';
 
-  // ===== DATA STATIS =====
   activities = [
     { icon: 'leaf-outline', type: 'plant', text: 'Menanam padi di lahan seluas 2 hektar', time: '2 jam lalu' },
     { icon: 'checkmark-done-outline', type: 'harvest', text: 'Panen jagung berhasil 500 kg', time: '5 jam lalu' },
@@ -79,6 +73,13 @@ export class DashboardPage implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    // 🔥 CEK APAKAH ADA TOKEN
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.router.navigate(['/login'], { replaceUrl: true });
+      return;
+    }
+    
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadDashboard();
   }
@@ -144,7 +145,6 @@ export class DashboardPage implements OnInit, AfterViewInit {
     }
   }
 
-  // ===== LOAD DATA =====
   loadDashboard() {
     this.isLoading = true;
     
@@ -166,7 +166,6 @@ export class DashboardPage implements OnInit, AfterViewInit {
       error: (error) => {
         console.error('❌ Dashboard error:', error);
         this.isLoading = false;
-        // Fallback data
         this.totalPekerja = 15;
         this.pekerjaAktif = 13;
         this.totalKehadiran = 0;
@@ -177,7 +176,6 @@ export class DashboardPage implements OnInit, AfterViewInit {
     });
   }
 
-  // ===== NAVIGASI =====
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
@@ -271,9 +269,19 @@ export class DashboardPage implements OnInit, AfterViewInit {
     return icons[this.activeMenu] || 'home-outline';
   }
 
+  // 🔥 LOGOUT - HAPUS TOKEN DAN REDIRECT KE LOGIN
   logout() {
+    // Hapus semua data
     this.apiService.clearToken();
     localStorage.removeItem('user');
-    this.router.navigate(['/login']);
+    localStorage.removeItem('token');
+    
+    // 🔥 NAVIGASI KE LOGIN DENGAN REPLACEURL
+    this.router.navigate(['/login'], { replaceUrl: true });
+    
+    // 🔥 BERSIHKAN HISTORY BROWSER
+    setTimeout(() => {
+      window.history.pushState(null, '', window.location.href);
+    }, 100);
   }
 }

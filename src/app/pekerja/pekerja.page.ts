@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../services/api';
 
 @Component({
   selector: 'app-pekerja',
@@ -15,7 +16,11 @@ export class PekerjaPage implements OnInit {
   // ===== DATA =====
   pekerja: any[] = [];
   filteredPekerja: any[] = [];
-  
+
+  // ===== LOADING =====
+  isLoading: boolean = false;
+  isSaving: boolean = false;
+
   // ===== STATISTIK =====
   pekerjaAktif: number = 0;
   pekerjaTidakAktif: number = 0;
@@ -44,35 +49,36 @@ export class PekerjaPage implements OnInit {
     alamat: '',
     aktif: true
   };
-  editIndex: number = -1;
+  editingId: number | null = null; // 🔥 pakai ID dari backend, bukan index array
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private apiService: ApiService) {}
 
   ngOnInit() {
-    this.initData();
-    this.filterData();
-    this.hitungStatistik();
-    this.calculatePagination();
+    this.loadPekerja();
   }
 
   // ============================================
-  // INIT DATA
+  // 🔥 LOAD DATA DARI BACKEND
   // ============================================
-  initData() {
-    this.pekerja = [
-      { nama: 'Bambang Supriyadi', posisi: 'Kepala Lahan', email: 'bambang@petani.com', password: 'bambang123', telepon: '0812-3456-7890', alamat: 'Jl. Pertanian No. 1', aktif: true, showPassword: false },
-      { nama: 'Siti Rahayu', posisi: 'Petani', email: 'siti@petani.com', password: 'siti123', telepon: '0812-3456-7891', alamat: 'Jl. Pertanian No. 2', aktif: true, showPassword: false },
-      { nama: 'Agus Setiawan', posisi: 'Petani', email: 'agus@petani.com', password: 'agus123', telepon: '0812-3456-7892', alamat: 'Jl. Pertanian No. 3', aktif: true, showPassword: false },
-      { nama: 'Dewi Lestari', posisi: 'Petani', email: 'dewi@petani.com', password: 'dewi123', telepon: '0812-3456-7893', alamat: 'Jl. Pertanian No. 4', aktif: true, showPassword: false },
-      { nama: 'Joko Widodo', posisi: 'Petani', email: 'joko@petani.com', password: 'joko123', telepon: '0812-3456-7894', alamat: 'Jl. Pertanian No. 5', aktif: false, showPassword: false },
-      { nama: 'Rina Anggraini', posisi: 'Penyemprot', email: 'rina@petani.com', password: 'rina123', telepon: '0812-3456-7895', alamat: 'Jl. Pertanian No. 6', aktif: true, showPassword: false },
-      { nama: 'Hendra Gunawan', posisi: 'Petani', email: 'hendra@petani.com', password: 'hendra123', telepon: '0812-3456-7896', alamat: 'Jl. Pertanian No. 7', aktif: true, showPassword: false },
-      { nama: 'Maya Sari', posisi: 'Petani', email: 'maya@petani.com', password: 'maya123', telepon: '0812-3456-7897', alamat: 'Jl. Pertanian No. 8', aktif: true, showPassword: false },
-      { nama: 'Dedi Mulyadi', posisi: 'Petani', email: 'dedi@petani.com', password: 'dedi123', telepon: '0812-3456-7898', alamat: 'Jl. Pertanian No. 9', aktif: false, showPassword: false },
-      { nama: 'Tuti Rahayu', posisi: 'Petani', email: 'tuti@petani.com', password: 'tuti123', telepon: '0812-3456-7899', alamat: 'Jl. Pertanian No. 10', aktif: true, showPassword: false },
-      { nama: 'Slamet Riyadi', posisi: 'Penyemprot', email: 'slamet@petani.com', password: 'slamet123', telepon: '0812-3456-7800', alamat: 'Jl. Pertanian No. 11', aktif: true, showPassword: false }
-    ];
-    this.filteredPekerja = [...this.pekerja];
+  loadPekerja() {
+    this.isLoading = true;
+    this.apiService.getPekerja().subscribe({
+      next: (res: any) => {
+        // Sesuaikan kalau struktur response backend kamu beda,
+        // misal { data: [...] } atau langsung array [...]
+        const data = res?.data ?? res ?? [];
+        this.pekerja = data.map((p: any) => ({ ...p, showPassword: false }));
+        this.filterData();
+        this.hitungStatistik();
+        this.calculatePagination();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('❌ Gagal memuat data pekerja:', err);
+        alert('⚠️ Gagal memuat data pekerja. Cek koneksi ke server.');
+        this.isLoading = false;
+      }
+    });
   }
 
   // ============================================
@@ -81,9 +87,9 @@ export class PekerjaPage implements OnInit {
   hitungStatistik() {
     this.pekerjaAktif = this.pekerja.filter(p => p.aktif).length;
     this.pekerjaTidakAktif = this.pekerja.filter(p => !p.aktif).length;
-    
+
     let total = 0;
-    this.pekerja.forEach(p => { total += 3500000; });
+    this.pekerja.forEach(p => { total += (p.gaji ?? 3500000); });
     this.totalGaji = (total / 1000000).toFixed(1) + ' Jt';
   }
 
@@ -142,47 +148,46 @@ export class PekerjaPage implements OnInit {
   toggleFormPassword() { this.showFormPassword = !this.showFormPassword; }
 
   // ============================================
-  // 🔥 MODAL - FUNGSI UNTUK BUKA/TUTUP
+  // 🔥 MODAL - TAMBAH PEKERJA
   // ============================================
-  
-  // Fungsi ini akan dipanggil saat modal dibuka via trigger
-  // Tapi kita tetap perlu mengatur isEditing dan formData
-
-  editPekerja(item: any) {
-    console.log('🔥 Edit pekerja:', item.nama);
-    this.isEditing = true;
-    this.editIndex = this.pekerja.indexOf(item);
-    this.formData = { ...item };
-    this.isModalOpen = true;
-  }
-
-  closeModal() {
-    console.log('🔥 Menutup modal');
-    this.isModalOpen = false;
-    this.showFormPassword = false;
-  }
-
-  // Fungsi ini dipanggil saat modal dibuka via trigger
-  // Kita gunakan untuk reset form saat tambah baru
   openModal() {
-    console.log('🔥 Membuka modal Tambah Pekerja');
     this.isEditing = false;
-    this.formData = { 
-      nama: '', 
-      posisi: '', 
-      email: '', 
-      password: '', 
-      telepon: '', 
-      alamat: '', 
-      aktif: true 
+    this.editingId = null;
+    this.formData = {
+      nama: '',
+      posisi: '',
+      email: '',
+      password: '',
+      telepon: '',
+      alamat: '',
+      aktif: true
     };
     this.isModalOpen = true;
   }
 
+  // ============================================
+  // 🔥 EDIT PEKERJA
+  // ============================================
+  editPekerja(item: any) {
+    this.isEditing = true;
+    this.editingId = item.id; // 🔥 simpan ID asli dari backend
+    this.formData = { ...item };
+    this.isModalOpen = true;
+  }
+
+  // ============================================
+  // 🔥 CLOSE MODAL
+  // ============================================
+  closeModal() {
+    this.isModalOpen = false;
+    this.showFormPassword = false;
+  }
+
+  // ============================================
+  // 🔥 SIMPAN PEKERJA (TAMBAH / UPDATE) — VIA API
+  // ============================================
   simpanPekerja() {
-    console.log('🔥 Menyimpan pekerja...');
-    console.log('Form Data:', this.formData);
-    
+    // Validasi
     if (!this.formData.nama || !this.formData.posisi || !this.formData.email || !this.formData.password) {
       alert('⚠️ Harap isi semua field yang wajib (*)!');
       return;
@@ -193,40 +198,68 @@ export class PekerjaPage implements OnInit {
       return;
     }
 
-    const emailExists = this.pekerja.some(p => p.email === this.formData.email && p !== this.pekerja[this.editIndex]);
+    // Cek duplikat email (kecuali email milik data yang sedang diedit)
+    const emailExists = this.pekerja.some(
+      p => p.email === this.formData.email && p.id !== this.editingId
+    );
     if (emailExists) {
       alert('⚠️ Email sudah terdaftar!');
       return;
     }
 
-    if (this.isEditing) {
-      this.pekerja[this.editIndex] = { ...this.formData, showPassword: false };
-      alert(`✅ ${this.formData.nama} berhasil diupdate!`);
-    } else {
-      const newPekerja = { ...this.formData, showPassword: false };
-      this.pekerja.push(newPekerja);
-      console.log('Pekerja baru:', newPekerja);
-      alert(`✅ ${this.formData.nama} berhasil ditambahkan!`);
-    }
+    this.isSaving = true;
+    const payload = { ...this.formData };
+    delete payload.showPassword;
 
-    this.closeModal();
-    this.filterData();
-    this.hitungStatistik();
-    this.calculatePagination();
+    if (this.isEditing && this.editingId !== null) {
+      // 🔥 UPDATE PEKERJA VIA API
+      this.apiService.updatePekerja(this.editingId, payload).subscribe({
+        next: () => {
+          alert(`✅ ${this.formData.nama} berhasil diupdate!`);
+          this.isSaving = false;
+          this.closeModal();
+          this.loadPekerja(); // refresh data dari server
+        },
+        error: (err) => {
+          console.error('❌ Gagal update pekerja:', err);
+          alert('⚠️ Gagal mengupdate pekerja. Coba lagi.');
+          this.isSaving = false;
+        }
+      });
+    } else {
+      // 🔥 TAMBAH PEKERJA BARU VIA API
+      this.apiService.createPekerja(payload).subscribe({
+        next: () => {
+          alert(`✅ ${this.formData.nama} berhasil ditambahkan!`);
+          this.isSaving = false;
+          this.closeModal();
+          this.loadPekerja(); // refresh data dari server
+        },
+        error: (err) => {
+          console.error('❌ Gagal menambah pekerja:', err);
+          alert('⚠️ Gagal menambahkan pekerja. Coba lagi.');
+          this.isSaving = false;
+        }
+      });
+    }
   }
 
   // ============================================
-  // HAPUS PEKERJA
+  // 🔥 HAPUS PEKERJA — VIA API
   // ============================================
   hapusPekerja(item: any) {
-    if (confirm(`Apakah Anda yakin ingin menghapus ${item.nama}?`)) {
-      const index = this.pekerja.indexOf(item);
-      if (index !== -1) this.pekerja.splice(index, 1);
-      this.filterData();
-      this.hitungStatistik();
-      this.calculatePagination();
-      alert(`✅ ${item.nama} berhasil dihapus!`);
-    }
+    if (!confirm(`Apakah Anda yakin ingin menghapus ${item.nama}?`)) return;
+
+    this.apiService.deletePekerja(item.id).subscribe({
+      next: () => {
+        alert(`✅ ${item.nama} berhasil dihapus!`);
+        this.loadPekerja(); // refresh data dari server
+      },
+      error: (err) => {
+        console.error('❌ Gagal menghapus pekerja:', err);
+        alert('⚠️ Gagal menghapus pekerja. Coba lagi.');
+      }
+    });
   }
 
   // ============================================

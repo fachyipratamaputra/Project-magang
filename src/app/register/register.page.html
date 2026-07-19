@@ -35,6 +35,7 @@
 
       <!-- Form Register -->
       <form (ngSubmit)="onRegister()" class="register-form">
+        
         <!-- Nama Lengkap -->
         <div class="input-group">
           <div class="input-icon">
@@ -188,17 +189,18 @@
           </div>
         </div>
 
-        <!-- Tombol Register -->
-        <ion-button 
-          expand="block" 
-          class="register-btn" 
-          type="submit"
-          [disabled]="!fullname || !username || !email || !password || !confirmPassword || isLoading || !usernameAvailable"
-        >
-          <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
-          <span *ngIf="!isLoading" class="btn-text">Daftar Sekarang</span>
-          <ion-icon *ngIf="!isLoading" slot="end" name="arrow-forward-outline"></ion-icon>
-        </ion-button>
+        <!-- Tombol Register - DI TENGAH -->
+        <div class="button-center">
+          <ion-button 
+            class="register-btn" 
+            type="submit"
+            [disabled]="!fullname || !username || !email || !password || !confirmPassword || isLoading || !usernameAvailable"
+          >
+            <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+            <span *ngIf="!isLoading" class="btn-text">Daftar Sekarang</span>
+            <ion-icon *ngIf="!isLoading" slot="end" name="arrow-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
 
         <!-- Login Link -->
         <div class="login-link">

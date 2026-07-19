@@ -25,7 +25,23 @@ export class LoginPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    // 🔥 CEK APAKAH SUDAH LOGIN
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.router.navigate(['/dashboard'], { replaceUrl: true });
+    }
     this.testConnection();
+    
+    // 🔥 MENCEGAH BACK BUTTON KE DASHBOARD
+    this.preventBackButton();
+  }
+
+  // 🔥 MENCEGAH BACK BUTTON
+  preventBackButton() {
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', (event) => {
+      window.history.pushState(null, '', window.location.href);
+    });
   }
 
   testConnection() {
@@ -66,7 +82,7 @@ export class LoginPage implements OnInit {
         if (response.status === 'success') {
           this.apiService.setToken(response.data.token);
           localStorage.setItem('user', JSON.stringify(response.data.user));
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/dashboard'], { replaceUrl: true });
         } else {
           alert(response.message || 'Login gagal!');
         }
@@ -79,19 +95,21 @@ export class LoginPage implements OnInit {
     });
   }
 
-  goToRegister() {
-    this.router.navigate(['/register']);
-  }
-
-  forgotPassword() {
-    alert('Silakan hubungi admin untuk reset password.');
-  }
-
+  // 🔥 FUNGSI UNTUK GOOGLE LOGIN
   onLoginGoogle() {
     alert('Fitur Google Login segera hadir!');
   }
 
+  // 🔥 FUNGSI UNTUK FACEBOOK LOGIN
   onLoginFacebook() {
     alert('Fitur Facebook Login segera hadir!');
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register'], { replaceUrl: true });
+  }
+
+  forgotPassword() {
+    alert('Silakan hubungi admin untuk reset password.');
   }
 }

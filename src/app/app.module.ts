@@ -4,34 +4,27 @@ import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { HttpClientModule } from '@angular/common/http';
 
+// 🔥 IMPORT FIREBASE
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { environment } from '../environments/environment';
+
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routes';
 
-// Import semua pages
-import { LoginPage } from './login/login.page';
-import { DashboardPage } from './dashboard/dashboard.page';
-import { ProfilePage } from './profil/profil.page';
-import { KehadiranPage } from './kehadiran/kehadiran.page';
-import { PekerjaPage } from './pekerja/pekerja.page';
-import { PembayaranPage } from './pembayaran/pembayaran.page';
-
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginPage,
-    DashboardPage,
-    ProfilePage,
-    KehadiranPage,
-    PekerjaPage,
-    PembayaranPage,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    HttpClientModule,  // 🔥 WAJIB ADA
+    HttpClientModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig), // 🔥 INIT FIREBASE
+    AngularFireAuthModule, // 🔥 AUTH MODULE
   ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

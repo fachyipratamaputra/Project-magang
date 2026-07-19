@@ -23,8 +23,6 @@ export class RegisterPage {
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
   isLoading: boolean = false;
-
-  // ===== VALIDASI USERNAME =====
   usernameAvailable: boolean = true;
   usernameChecking: boolean = false;
   usernameSuggestions: string[] = [];
@@ -36,7 +34,6 @@ export class RegisterPage {
     private router: Router,
     private apiService: ApiService
   ) {
-    // Setup debounce untuk cek username
     this.usernameSubject.pipe(
       debounceTime(500),
       distinctUntilChanged(),
@@ -81,13 +78,11 @@ export class RegisterPage {
     });
   }
 
-  // ===== CEK USERNAME REAL-TIME =====
   onUsernameChange() {
     this.usernameChecking = true;
     this.usernameSubject.next(this.username);
   }
 
-  // ===== GUNAKAN SARAN USERNAME =====
   useSuggestion(suggestion: string) {
     this.username = suggestion;
     this.onUsernameChange();
@@ -101,9 +96,7 @@ export class RegisterPage {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  // ===== REGISTER =====
   onRegister() {
-    // Validasi
     if (!this.fullname || !this.username || !this.email || !this.password || !this.confirmPassword) {
       alert('⚠️ Harap isi semua field!');
       return;
@@ -138,7 +131,7 @@ export class RegisterPage {
         
         if (response.status === 'success') {
           alert('✅ Registrasi berhasil! Silakan login.');
-          this.router.navigate(['/login']);
+          this.router.navigate(['/login'], { replaceUrl: true });
         } else {
           alert(response.message || 'Registrasi gagal!');
         }
@@ -158,12 +151,10 @@ export class RegisterPage {
     });
   }
 
-  // ===== GO TO LOGIN =====
   goToLogin() {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 
-  // ===== SOCIAL REGISTER =====
   onRegisterGoogle() {
     alert('Fitur Google Register segera hadir!');
   }
