@@ -99,7 +99,6 @@
           <h4 class="table-title">📋 Daftar Pekerja</h4>
           <span class="table-subtitle">Menampilkan {{ filteredPekerja.length }} dari {{ pekerja.length }} pekerja</span>
         </div>
-        <!-- 🔥 TOMBOL TAMBAH -->
         <ion-button class="tambah-btn" fill="solid" size="small" (click)="openModal()">
           <ion-icon name="add-outline"></ion-icon>
           Tambah
@@ -195,9 +194,16 @@
 </ion-content>
 
 <!-- ========================================== -->
-<!-- 🔥 MODAL TAMBAH/EDIT PEKERJA              -->
+<!-- 🔥 MODAL TAMBAH/EDIT PEKERJA -->
+<!-- cssClass="pekerja-modal" -> stylingnya ada di global.scss -->
 <!-- ========================================== -->
-<ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+<ion-modal 
+  #pekerjaModal 
+  [isOpen]="isModalOpen" 
+  (didDismiss)="closeModal()" 
+  [backdropDismiss]="true"
+  cssClass="pekerja-modal"
+>
   <ng-template>
     <ion-header>
       <ion-toolbar>

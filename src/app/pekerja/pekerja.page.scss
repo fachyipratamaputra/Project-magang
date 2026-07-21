@@ -430,7 +430,9 @@
 }
 
 // ============================================
-// MODAL
+// MODAL (styling isi konten modal — ini AMAN di sini
+// karena ion-content di dalam ng-template tetap dapat
+// class-nya, hanya sizing ion-modal-nya yang harus global)
 // ============================================
 .modal-content {
   --background: #f8faf8;

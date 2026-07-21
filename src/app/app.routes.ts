@@ -45,5 +45,9 @@ export const routes: Routes = [
     loadComponent: () => import('./lahan/lahan.page').then(m => m.LahanPage),
     canActivate: [AuthGuard]
   },
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'login' },
+  {
+    path: 'berita',
+    loadComponent: () => import('./berita/berita.page').then( m => m.BeritaPage)
+  }
 ];

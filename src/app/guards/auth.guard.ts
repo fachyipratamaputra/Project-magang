@@ -14,7 +14,6 @@ export class AuthGuard implements CanActivate {
     if (token) {
       return true;
     } else {
-      // 🔥 GANTI HISTORY AGAR TIDAK BISA BACK
       this.router.navigate(['/login'], { replaceUrl: true });
       return false;
     }
