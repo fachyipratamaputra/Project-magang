@@ -1,0 +1,181 @@
+<ion-content class="gaji-content">
+  <div class="gaji-container">
+    <!-- ===== HEADER ===== -->
+    <div class="gaji-header">
+      <div class="header-back" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </div>
+      <h1 class="header-title">Informasi Gaji</h1>
+      <div class="header-action" (click)="refreshData()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </div>
+    </div>
+
+    <!-- ===== PROFIL PEKERJA ===== -->
+    <div class="profile-card">
+      <div class="profile-row">
+        <div class="profile-item">
+          <span class="profile-label">Nama</span>
+          <span class="profile-value">{{ user.nama || 'Pekerja' }}</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">ID Pekerja</span>
+          <span class="profile-value">{{ user.id || 'PK-001' }}</span>
+        </div>
+      </div>
+      <div class="profile-row">
+        <div class="profile-item">
+          <span class="profile-label">Posisi</span>
+          <span class="profile-value">{{ user.posisi || 'Pemilik Lahan' }}</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">Lahan</span>
+          <span class="profile-value">{{ user.lahan || 'Lahan A' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RINGKASAN GAJI ===== -->
+    <div class="summary-card">
+      <div class="summary-header">
+        <h3 class="summary-title">💰 Ringkasan Gaji</h3>
+        <span class="summary-period">{{ bulanSekarang }}</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-value">Rp {{ totalGaji | number }}</span>
+          <span class="summary-label">Total Gaji</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-item">
+          <span class="summary-value text-success">Rp {{ gajiDibayar | number }}</span>
+          <span class="summary-label">Sudah Dibayar</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-item">
+          <span class="summary-value text-danger">Rp {{ gajiBelumDibayar | number }}</span>
+          <span class="summary-label">Belum Dibayar</span>
+        </div>
+      </div>
+      <div class="summary-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="persentasePembayaran"></div>
+        </div>
+        <span class="progress-text">{{ persentasePembayaran }}% Terbayar</span>
+      </div>
+    </div>
+
+    <!-- ===== FILTER ===== -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>Periode</label>
+          <ion-select [(ngModel)]="filterPeriode" (ionChange)="applyFilter()" placeholder="Pilih Periode">
+            <ion-select-option value="all">Semua</ion-select-option>
+            <ion-select-option value="month">Bulan Ini</ion-select-option>
+            <ion-select-option value="3months">3 Bulan Terakhir</ion-select-option>
+            <ion-select-option value="6months">6 Bulan Terakhir</ion-select-option>
+            <ion-select-option value="year">Tahun Ini</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="filter-group">
+          <label>Status</label>
+          <ion-select [(ngModel)]="filterStatus" (ionChange)="applyFilter()" placeholder="Semua Status">
+            <ion-select-option value="">Semua Status</ion-select-option>
+            <ion-select-option value="dibayar">Sudah Dibayar</ion-select-option>
+            <ion-select-option value="pending">Pending</ion-select-option>
+            <ion-select-option value="gagal">Gagal</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LOADING ===== -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Memuat data gaji...</p>
+    </div>
+
+    <!-- ===== DATA KOSONG ===== -->
+    <div *ngIf="!isLoading && dataGaji.length === 0" class="empty-state">
+      <ion-icon name="cash-outline"></ion-icon>
+      <p>Belum ada data gaji</p>
+      <span class="empty-sub">Riwayat pembayaran akan muncul di sini</span>
+    </div>
+
+    <!-- ===== TABEL GAJI ===== -->
+    <div class="table-container" *ngIf="!isLoading && dataGaji.length > 0">
+      <div class="table-header">
+        <div class="table-title">
+          <h3>📋 Riwayat Pembayaran</h3>
+          <span class="table-count">{{ dataGaji.length }} Data</span>
+        </div>
+        <ion-button class="export-btn" fill="clear" size="small" (click)="exportData()">
+          <ion-icon name="download-outline"></ion-icon>
+          Export
+        </ion-button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Periode</th>
+              <th>Jumlah Gaji</th>
+              <th>Tanggal Bayar</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of dataGaji; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ item.periode || '-' }}</td>
+              <td class="text-bold">Rp {{ item.jumlah | number }}</td>
+              <td>{{ item.tanggal_bayar || '-' }}</td>
+              <td>
+                <span class="status-badge" 
+                      [class.dibayar]="item.status === 'dibayar'"
+                      [class.pending]="item.status === 'pending'"
+                      [class.gagal]="item.status === 'gagal'">
+                  {{ item.status === 'dibayar' ? '✅ Dibayar' : 
+                     item.status === 'pending' ? '⏳ Pending' : 
+                     '❌ Gagal' }}
+                </span>
+              </td>
+              <td>
+                <ion-button fill="clear" size="small" class="action-btn" (click)="lihatDetail(item)">
+                  <ion-icon name="eye-outline"></ion-icon>
+                </ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== PAGINATION ===== -->
+      <div class="table-footer">
+        <div class="rows-info">
+          <span>Rows per page:</span>
+          <ion-select [(ngModel)]="rowsPerPage" (ionChange)="onRowsPerPageChange()" interface="popover">
+            <ion-select-option value="5">5</ion-select-option>
+            <ion-select-option value="10">10</ion-select-option>
+            <ion-select-option value="25">25</ion-select-option>
+            <ion-select-option value="50">50</ion-select-option>
+          </ion-select>
+          <span>{{ startIndex + 1 }}-{{ endIndex }} of {{ totalData }}</span>
+        </div>
+        <div class="pagination-buttons">
+          <ion-button fill="clear" size="small" (click)="prevPage()" [disabled]="currentPage === 1">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </ion-button>
+          <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+          <ion-button fill="clear" size="small" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

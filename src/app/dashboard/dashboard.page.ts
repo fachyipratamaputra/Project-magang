@@ -24,6 +24,7 @@ export class DashboardPage implements OnInit, AfterViewInit {
   
   user: any = {};
   isLoading: boolean = true;
+  pendingCount: number = 0;
   
   totalPekerja: number = 0;
   pekerjaAktif: number = 0;
@@ -73,7 +74,6 @@ export class DashboardPage implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    // 🔥 CEK APAKAH ADA TOKEN
     const token = localStorage.getItem('token');
     if (!token) {
       this.router.navigate(['/login'], { replaceUrl: true });
@@ -82,6 +82,7 @@ export class DashboardPage implements OnInit, AfterViewInit {
     
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     this.loadDashboard();
+    this.loadPendingCount();
   }
 
   ngAfterViewInit() {
@@ -163,7 +164,7 @@ export class DashboardPage implements OnInit, AfterViewInit {
           this.pembayaranBerhasil = data.pembayaran_berhasil || 0;
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('❌ Dashboard error:', error);
         this.isLoading = false;
         this.totalPekerja = 15;
@@ -172,6 +173,17 @@ export class DashboardPage implements OnInit, AfterViewInit {
         this.kehadiranHadir = 0;
         this.totalPembayaran = 25500000;
         this.pembayaranBerhasil = 7;
+      }
+    });
+  }
+
+  loadPendingCount() {
+    this.apiService.getCountNotifikasiPending().subscribe({
+      next: (res: any) => {
+        this.pendingCount = res.data?.total || 0;
+      },
+      error: (err: any) => {
+        console.error(err);
       }
     });
   }
@@ -215,6 +227,15 @@ export class DashboardPage implements OnInit, AfterViewInit {
     this.router.navigate(['/profile']);
   }
 
+  goToBerita() {
+    this.router.navigate(['/berita']);
+  }
+
+  // 🔥 FIX: path disamain dengan yang didaftarin di app.routes.ts ('notification', bukan 'notifikasi')
+  goToNotifikasi() {
+    this.router.navigate(['/notifikasi']);
+  }
+
   setActiveMenu(menu: string) {
     this.activeMenu = menu;
     if (window.innerWidth < 1024) {
@@ -232,6 +253,8 @@ export class DashboardPage implements OnInit, AfterViewInit {
       'kehadiran': 'Kehadiran',
       'pekerja': 'Pekerja',
       'pembayaran': 'Pembayaran',
+      'berita': 'Berita',
+      'notifikasi': 'Notifikasi',
       'bantuan': 'Bantuan',
       'pengaturan': 'Pengaturan'
     };
@@ -248,6 +271,8 @@ export class DashboardPage implements OnInit, AfterViewInit {
       'kehadiran': 'Pantau kehadiran pekerja',
       'pekerja': 'Kelola data pekerja',
       'pembayaran': 'Kelola penggajian karyawan',
+      'berita': 'Kelola berita dan informasi',
+      'notifikasi': 'Kelola permintaan dari pengguna',
       'bantuan': 'Pusat bantuan',
       'pengaturan': 'Pengaturan aplikasi'
     };
@@ -263,23 +288,19 @@ export class DashboardPage implements OnInit, AfterViewInit {
       'kehadiran': 'calendar-outline',
       'pekerja': 'people-outline',
       'pembayaran': 'wallet-outline',
+      'berita': 'newspaper-outline',
+      'notifikasi': 'notifications-outline',
       'bantuan': 'help-circle-outline',
       'pengaturan': 'settings-outline'
     };
     return icons[this.activeMenu] || 'home-outline';
   }
 
-  // 🔥 LOGOUT - HAPUS TOKEN DAN REDIRECT KE LOGIN
   logout() {
-    // Hapus semua data
     this.apiService.clearToken();
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    
-    // 🔥 NAVIGASI KE LOGIN DENGAN REPLACEURL
     this.router.navigate(['/login'], { replaceUrl: true });
-    
-    // 🔥 BERSIHKAN HISTORY BROWSER
     setTimeout(() => {
       window.history.pushState(null, '', window.location.href);
     }, 100);

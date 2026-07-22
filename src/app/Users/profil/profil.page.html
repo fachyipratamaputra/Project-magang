@@ -1,0 +1,97 @@
+<ion-content class="profile-content">
+  <div class="profile-container">
+    <!-- ===== HEADER ===== -->
+    <div class="profile-header">
+      <div class="header-back" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </div>
+      <h1 class="header-title">Profil Saya</h1>
+      <div class="header-action" (click)="editProfile()">
+        <ion-icon name="create-outline"></ion-icon>
+      </div>
+    </div>
+
+    <!-- ===== PROFIL CARD ===== -->
+    <div class="profile-card">
+      <div class="profile-avatar-section">
+        <div class="avatar-wrapper">
+          <img 
+            [src]="profile.avatar || 'https://ui-avatars.com/api/?name=' + profile.nama + '&background=2e7d32&color=fff&size=200&bold=true'" 
+            alt="Profile"
+            class="profile-avatar"
+          />
+          <div class="avatar-edit" (click)="changeAvatar()">
+            <ion-icon name="camera-outline"></ion-icon>
+          </div>
+        </div>
+        <h2 class="profile-name">{{ profile.nama }}</h2>
+        <p class="profile-role">👨‍🌾 {{ profile.role }}</p>
+        <div class="profile-status">
+          <span class="status-dot"></span>
+          <span class="status-text">Aktif</span>
+        </div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ profile.totalLahan }}</span>
+          <span class="stat-label">Lahan</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">{{ profile.totalTanaman }}</span>
+          <span class="stat-label">Tanaman</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">{{ profile.totalPanen }}</span>
+          <span class="stat-label">Panen</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== INFO DETAIL ===== -->
+    <div class="info-section">
+      <h3 class="section-title">Informasi Pribadi</h3>
+      
+      <div class="info-card">
+        <div class="info-item" *ngFor="let info of personalInfo">
+          <div class="info-icon">
+            <ion-icon [name]="info.icon"></ion-icon>
+          </div>
+          <div class="info-content">
+            <span class="info-label">{{ info.label }}</span>
+            <span class="info-value">{{ info.value }}</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="info-arrow"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PENGATURAN ===== -->
+    <div class="info-section">
+      <h3 class="section-title">Pengaturan</h3>
+      
+      <div class="info-card">
+        <div class="info-item" *ngFor="let setting of settings" (click)="setting.action()">
+          <div class="info-icon" [style.background]="setting.color">
+            <ion-icon [name]="setting.icon"></ion-icon>
+          </div>
+          <div class="info-content">
+            <span class="info-label">{{ setting.label }}</span>
+            <span class="info-value" *ngIf="setting.value">{{ setting.value }}</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="info-arrow"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TOMBOL LOGOUT ===== -->
+    <div class="logout-section">
+      <ion-button class="logout-btn" expand="block" (click)="logout()">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        Keluar
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

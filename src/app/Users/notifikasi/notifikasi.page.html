@@ -1,0 +1,105 @@
+<ion-content class="notifikasi-content">
+  <div class="notifikasi-container">
+    <!-- ===== HEADER ===== -->
+    <div class="notifikasi-header">
+      <div class="header-back" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </div>
+      <h1 class="header-title">Notifikasi</h1>
+      <div class="header-action" (click)="refreshData()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </div>
+    </div>
+
+    <!-- ===== STATISTIK ===== -->
+    <div class="stats-row">
+      <div class="stat-box" (click)="filterStatus('')">
+        <span class="stat-number">{{ totalNotifikasi }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-box" (click)="filterStatus('pending')">
+        <span class="stat-number text-warning">{{ totalPending }}</span>
+        <span class="stat-label">Pending</span>
+      </div>
+      <div class="stat-box" (click)="filterStatus('approve')">
+        <span class="stat-number text-success">{{ totalApprove }}</span>
+        <span class="stat-label">Disetujui</span>
+      </div>
+      <div class="stat-box" (click)="filterStatus('reject')">
+        <span class="stat-number text-danger">{{ totalReject }}</span>
+        <span class="stat-label">Ditolak</span>
+      </div>
+    </div>
+
+    <!-- ===== FILTER ===== -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>Status</label>
+          <ion-select [(ngModel)]="filterStatusSelected" (ionChange)="applyFilter()" placeholder="Semua Status">
+            <ion-select-option value="">Semua Status</ion-select-option>
+            <ion-select-option value="pending">⏳ Pending</ion-select-option>
+            <ion-select-option value="approve">✅ Disetujui</ion-select-option>
+            <ion-select-option value="reject">❌ Ditolak</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="filter-group">
+          <label>Urutkan</label>
+          <ion-select [(ngModel)]="filterSort" (ionChange)="applyFilter()" placeholder="Urutkan">
+            <ion-select-option value="terbaru">Terbaru</ion-select-option>
+            <ion-select-option value="terlama">Terlama</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+      <div class="filter-actions">
+        <ion-button class="mark-all-btn" fill="clear" size="small" (click)="markAllRead()" *ngIf="totalPending > 0">
+          <ion-icon name="checkmark-done-outline"></ion-icon>
+          Tandai Semua Dibaca
+        </ion-button>
+        <ion-button class="filter-btn" fill="clear" size="small" (click)="resetFilter()">
+          <ion-icon name="close-outline"></ion-icon>
+          Reset Filter
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- ===== LOADING ===== -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Memuat notifikasi...</p>
+    </div>
+
+    <!-- ===== DATA KOSONG ===== -->
+    <div *ngIf="!isLoading && dataNotifikasi.length === 0" class="empty-state">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <p>Belum ada notifikasi</p>
+      <span class="empty-sub">Notifikasi akan muncul di sini</span>
+    </div>
+
+    <!-- ===== LIST NOTIFIKASI ===== -->
+    <div class="notifikasi-list" *ngIf="!isLoading && dataNotifikasi.length > 0">
+      <div class="notifikasi-item" *ngFor="let item of dataNotifikasi" [class.unread]="!item.is_read" (click)="lihatDetail(item)">
+        <div class="notifikasi-icon" [class]="item.type">
+          <ion-icon [name]="getIcon(item.type)"></ion-icon>
+        </div>
+        <div class="notifikasi-content">
+          <div class="notifikasi-header-item">
+            <h4 class="notifikasi-title">{{ item.title }}</h4>
+            <span class="notifikasi-time">{{ item.time }}</span>
+          </div>
+          <p class="notifikasi-message">{{ item.message }}</p>
+          <div class="notifikasi-footer">
+            <span class="notifikasi-status" [class.pending]="item.status === 'pending'"
+                  [class.approve]="item.status === 'approve'"
+                  [class.reject]="item.status === 'reject'">
+              {{ item.status === 'pending' ? '⏳ Pending' : 
+                 item.status === 'approve' ? '✅ Disetujui' : 
+                 '❌ Ditolak' }}
+            </span>
+            <span class="notifikasi-badge" *ngIf="!item.is_read">Baru</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

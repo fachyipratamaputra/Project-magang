@@ -8,8 +8,8 @@
           <ion-icon name="arrow-back-outline"></ion-icon>
         </ion-button>
         <div>
-          <h1 class="page-title">📰 Manajemen Berita</h1>
-          <p class="page-subtitle">Kelola berita yang akan ditampilkan di website</p>
+          <h1 class="page-title">📰 Berita Saya</h1>
+          <p class="page-subtitle">Kelola berita yang Anda kirimkan</p>
         </div>
       </div>
       <div class="header-right">
@@ -36,8 +36,8 @@
           <ion-icon name="checkmark-circle-outline"></ion-icon>
         </div>
         <div class="stat-info">
-          <h3>{{ getTotalByStatus('publish') }}</h3>
-          <p>Publish</p>
+          <h3>{{ getTotalByStatus('approve') }}</h3>
+          <p>Disetujui</p>
         </div>
       </div>
       <div class="stat-card">
@@ -45,8 +45,17 @@
           <ion-icon name="time-outline"></ion-icon>
         </div>
         <div class="stat-info">
-          <h3>{{ getTotalByStatus('draft') }}</h3>
-          <p>Draft</p>
+          <h3>{{ getTotalByStatus('pending') }}</h3>
+          <p>Pending</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ getTotalByStatus('reject') }}</h3>
+          <p>Ditolak</p>
         </div>
       </div>
     </div>
@@ -57,8 +66,9 @@
         <label>Status</label>
         <ion-select [(ngModel)]="filterStatus" interface="action-sheet" (ionChange)="loadBerita()">
           <ion-select-option value="semua">Semua Status</ion-select-option>
-          <ion-select-option value="publish">✅ Publish</ion-select-option>
-          <ion-select-option value="draft">📝 Draft</ion-select-option>
+          <ion-select-option value="pending">⏳ Pending</ion-select-option>
+          <ion-select-option value="approve">✅ Disetujui</ion-select-option>
+          <ion-select-option value="reject">❌ Ditolak</ion-select-option>
         </ion-select>
       </div>
       <div class="filter-group">
@@ -75,9 +85,13 @@
       <div class="berita-card" *ngFor="let item of berita">
         <!-- Gambar -->
         <div class="berita-image" *ngIf="item.gambar">
-          <img [src]="'http://localhost:3000/uploads/berita/' + item.gambar" [alt]="item.judul">
-          <div class="status-badge" [class.publish]="item.status === 'publish'" [class.draft]="item.status === 'draft'">
-            {{ item.status === 'publish' ? '✅ Publish' : '📝 Draft' }}
+          <img [src]="apiBaseUrl + item.gambar" [alt]="item.judul" (error)="handleImageError($event)">
+          <div class="status-badge" [class.approve]="item.status === 'approve'" 
+                                    [class.pending]="item.status === 'pending'"
+                                    [class.reject]="item.status === 'reject'">
+            {{ item.status === 'approve' ? '✅ Disetujui' : 
+               item.status === 'pending' ? '⏳ Pending' : 
+               '❌ Ditolak' }}
           </div>
         </div>
         <div class="berita-image-placeholder" *ngIf="!item.gambar">
@@ -93,12 +107,16 @@
           </div>
           <h3 class="berita-judul">{{ item.judul }}</h3>
           <p class="berita-deskripsi">{{ item.deskripsi | slice:0:120 }}{{ item.deskripsi.length > 120 ? '...' : '' }}</p>
+          
+          <!-- Pesan Admin -->
+          <div class="berita-pesan" *ngIf="item.pesan_admin && item.status !== 'pending'">
+            <span class="pesan-label">📝 Admin:</span>
+            <span class="pesan-text">{{ item.pesan_admin }}</span>
+          </div>
+
           <div class="berita-footer">
-            <span class="penulis">✍️ Admin</span>
-            <div class="aksi-buttons">
-              <ion-button fill="clear" size="small" class="edit-btn" (click)="editBerita(item)">
-                <ion-icon name="create-outline"></ion-icon>
-              </ion-button>
+            <span class="penulis">✍️ {{ user.nama || 'Saya' }}</span>
+            <div class="aksi-buttons" *ngIf="item.status === 'pending'">
               <ion-button fill="clear" size="small" class="hapus-btn" (click)="hapusBerita(item)">
                 <ion-icon name="trash-outline"></ion-icon>
               </ion-button>
@@ -125,7 +143,7 @@
 </ion-content>
 
 <!-- ========================================== -->
-<!-- 🔥 MODAL TAMBAH/EDIT BERITA                -->
+<!-- 🔥 MODAL TAMBAH BERITA                     -->
 <!-- ========================================== -->
 <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
   <ng-template>
@@ -167,8 +185,7 @@
             <ion-select-option value="Ekonomi">💰 Ekonomi</ion-select-option>
             <ion-select-option value="Sosial">👥 Sosial</ion-select-option>
             <ion-select-option value="Politik">🏛️ Politik</ion-select-option>
-            <ion-select-option value="Kesehatan">🏥 Kesehatan</ion-select-option>
-            <ion-select-option value="Olahraga">⚽ Olahraga</ion-select-option>
+            <ion-select-option value="Komunitas">🤝 Komunitas</ion-select-option>
             <ion-select-option value="Lainnya">📌 Lainnya</ion-select-option>
           </ion-select>
         </div>
@@ -209,19 +226,6 @@
           >
         </div>
 
-        <!-- Status -->
-        <div class="form-group">
-          <label class="form-label">Status</label>
-          <ion-select 
-            [(ngModel)]="formData.status" 
-            interface="action-sheet"
-            class="form-select"
-          >
-            <ion-select-option value="publish">✅ Publish</ion-select-option>
-            <ion-select-option value="draft">📝 Draft</ion-select-option>
-          </ion-select>
-        </div>
-
         <!-- Tombol -->
         <div class="modal-actions">
           <ion-button class="cancel-modal-btn" fill="outline" (click)="closeModal()">
@@ -230,10 +234,10 @@
           <ion-button 
             class="submit-modal-btn" 
             (click)="simpanBerita()"
-            [disabled]="!formData.judul || !formData.deskripsi"
+            [disabled]="!formData.judul || !formData.deskripsi || !formData.kategori || isLoadingModal"
           >
-            <ion-icon name="save-outline" slot="start"></ion-icon>
-            {{ isEditing ? 'Update' : 'Simpan' }}
+            <ion-spinner *ngIf="isLoadingModal" name="crescent"></ion-spinner>
+            <span *ngIf="!isLoadingModal">{{ isEditing ? 'Update' : 'Kirim' }}</span>
           </ion-button>
         </div>
 

@@ -63,6 +63,20 @@
           <span class="menu-text">Pekerja</span>
         </div>
 
+        <div class="menu-label">KONTEN</div>
+        <!-- 🔥 MENU BERITA -->
+        <div class="menu-item" [class.active]="activeMenu === 'berita'" (click)="goToBerita()">
+          <div class="menu-icon-wrapper"><ion-icon name="newspaper-outline" class="menu-icon"></ion-icon></div>
+          <span class="menu-text">Berita</span>
+        </div>
+
+        <!-- Menu Notifikasi -->
+        <div class="menu-item" [class.active]="activeMenu === 'notifikasi'" (click)="goToNotifikasi()">
+          <div class="menu-icon-wrapper"><ion-icon name="notifications-outline" class="menu-icon"></ion-icon></div>
+          <span class="menu-text">Notifikasi</span>
+          <ion-badge class="menu-badge" *ngIf="pendingCount > 0">{{ pendingCount }}</ion-badge>
+        </div>
+
         <div class="menu-label">LAINNYA</div>
         <div class="menu-item" [class.active]="activeMenu === 'pembayaran'" (click)="goToPembayaran()">
           <div class="menu-icon-wrapper"><ion-icon name="wallet-outline" class="menu-icon"></ion-icon></div>

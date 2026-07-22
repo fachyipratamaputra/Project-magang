@@ -13,7 +13,7 @@ import { ApiService } from '../services/api';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class LoginPage implements OnInit {
-  username: string = '51240075';
+  username: string = '';
   password: string = '';
   showPassword: boolean = false;
   isLoading: boolean = false;
@@ -28,11 +28,11 @@ export class LoginPage implements OnInit {
     // 🔥 CEK APAKAH SUDAH LOGIN
     const token = localStorage.getItem('token');
     if (token) {
-      this.router.navigate(['/dashboard'], { replaceUrl: true });
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      this.redirectByRole(user?.role || 'user');
+      return;
     }
     this.testConnection();
-    
-    // 🔥 MENCEGAH BACK BUTTON KE DASHBOARD
     this.preventBackButton();
   }
 
@@ -63,6 +63,9 @@ export class LoginPage implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
+  // ==========================================
+  // 🔥 LOGIN - DENGAN DEBUG
+  // ==========================================
   onLogin() {
     if (!this.username || !this.password) {
       alert('Harap isi username dan password!');
@@ -70,37 +73,110 @@ export class LoginPage implements OnInit {
     }
 
     this.isLoading = true;
+    console.log('📤 Mencoba login dengan:', this.username);
 
     this.apiService.login({
       username: this.username,
       password: this.password
     }).subscribe({
       next: (response: any) => {
-        console.log('✅ Login berhasil:', response);
+        console.log('✅ Response dari server:', response);
         this.isLoading = false;
         
-        if (response.status === 'success') {
-          this.apiService.setToken(response.data.token);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-          this.router.navigate(['/dashboard'], { replaceUrl: true });
+        // 🔥 CEK RESPONSE - SUPPORT BEBERAPA FORMAT
+        // Format 1: { status: 'success', token: '...', user: {...} }
+        // Format 2: { token: '...', user: {...} }
+        // Format 3: { data: { token: '...', user: {...} } }
+        // Format 4: { success: true, data: { token: '...', user: {...} } }
+        
+        let token = null;
+        let user = null;
+        let isSuccess = false;
+
+        // Cek format response
+        if (response.token) {
+          // Format 2: { token: '...', user: {...} }
+          token = response.token;
+          user = response.user;
+          isSuccess = true;
+        } else if (response.status === 'success' && response.data) {
+          // Format 1: { status: 'success', data: { token: '...', user: {...} } }
+          token = response.data.token;
+          user = response.data.user;
+          isSuccess = true;
+        } else if (response.data && response.data.token) {
+          // Format 3: { data: { token: '...', user: {...} } }
+          token = response.data.token;
+          user = response.data.user;
+          isSuccess = true;
+        } else if (response.success && response.data) {
+          // Format 4: { success: true, data: { token: '...', user: {...} } }
+          token = response.data.token;
+          user = response.data.user;
+          isSuccess = true;
+        } else if (response.user && response.token) {
+          // Format langsung
+          token = response.token;
+          user = response.user;
+          isSuccess = true;
+        }
+
+        if (isSuccess && token) {
+          console.log('✅ Login berhasil! Token:', token);
+          console.log('👤 User:', user);
+          
+          this.apiService.setToken(token);
+          
+          if (user) {
+            localStorage.setItem('user', JSON.stringify(user));
+          }
+
+          // 🔥 REDIRECT BERDASARKAN ROLE
+          const role = user?.role || response.role || 'user';
+          console.log('🔑 Role:', role);
+          this.redirectByRole(role);
+          
         } else {
-          alert(response.message || 'Login gagal!');
+          console.error('❌ Response tidak valid:', response);
+          alert('Login gagal! Format response tidak sesuai. Silakan cek console.');
         }
       },
       error: (error) => {
         console.error('❌ Login error:', error);
         this.isLoading = false;
-        alert('Login gagal! Periksa username dan password.');
+        
+        // Tampilkan pesan error yang lebih informatif
+        let errorMessage = 'Login gagal! Periksa username dan password.';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        alert(errorMessage);
       }
     });
   }
 
-  // 🔥 FUNGSI UNTUK GOOGLE LOGIN
+  // ==========================================
+  // 🔥 REDIRECT FUNCTION
+  // ==========================================
+  redirectByRole(role: string) {
+    console.log('🔑 Redirect berdasarkan role:', role);
+    
+    if (role === 'admin') {
+      this.router.navigate(['/dashboard'], { replaceUrl: true });
+    } else {
+      this.router.navigate(['/user-dashboard'], { replaceUrl: true });
+    }
+  }
+
+  // ==========================================
+  // SOCIAL LOGIN
+  // ==========================================
   onLoginGoogle() {
     alert('Fitur Google Login segera hadir!');
   }
 
-  // 🔥 FUNGSI UNTUK FACEBOOK LOGIN
   onLoginFacebook() {
     alert('Fitur Facebook Login segera hadir!');
   }

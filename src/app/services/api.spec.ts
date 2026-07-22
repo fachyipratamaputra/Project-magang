@@ -177,6 +177,46 @@ export class ApiService {
   }
 
   // ==========================================
+// 📰 BERITA
+// ==========================================
+getBerita(kategori?: string, status?: string): Observable<any> {
+    let url = `${this.baseUrl}/berita`;
+    const params = [];
+    if (kategori && kategori !== 'semua') params.push(`kategori=${kategori}`);
+    if (status && status !== 'semua') params.push(`status=${status}`);
+    if (params.length) url += `?${params.join('&')}`;
+    return this.http.get(url, { headers: this.getHeaders() });
+}
+
+getBeritaById(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/berita/${id}`, { headers: this.getHeaders() });
+}
+
+createBerita(data: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/berita`, data, { 
+        headers: new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        })
+    });
+}
+
+updateBerita(id: number, data: FormData): Observable<any> {
+    return this.http.put(`${this.baseUrl}/berita/${id}`, data, {
+        headers: new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        })
+    });
+}
+
+deleteBerita(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/berita/${id}`, { headers: this.getHeaders() });
+}
+
+getKategoriBerita(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/berita/kategori/list`, { headers: this.getHeaders() });
+}
+
+  // ==========================================
   // 📊 DASHBOARD
   // ==========================================
   getDashboard(): Observable<any> {

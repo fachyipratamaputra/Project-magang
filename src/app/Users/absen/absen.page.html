@@ -1,0 +1,207 @@
+<ion-content class="absensi-content">
+  <div class="absensi-container">
+    <!-- ===== HEADER ===== -->
+    <div class="absensi-header">
+      <div class="header-back" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </div>
+      <h1 class="header-title">Absensi Pekerja</h1>
+      <div class="header-action" (click)="refreshData()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </div>
+    </div>
+
+    <!-- ===== PROFIL PEKERJA ===== -->
+    <div class="profile-card">
+      <div class="profile-row">
+        <div class="profile-item">
+          <span class="profile-label">Nama</span>
+          <span class="profile-value">{{ user.nama || 'Pekerja' }}</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">ID Pekerja</span>
+          <span class="profile-value">{{ user.id || 'PK-001' }}</span>
+        </div>
+      </div>
+      <div class="profile-row">
+        <div class="profile-item">
+          <span class="profile-label">Posisi</span>
+          <span class="profile-value">{{ user.posisi || 'Pemilik Lahan' }}</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">Lahan</span>
+          <span class="profile-value">{{ user.lahan || 'Lahan A' }}</span>
+        </div>
+      </div>
+      <div class="profile-row">
+        <div class="profile-item full">
+          <span class="profile-label">Status</span>
+          <span class="profile-value status-active">
+            <span class="status-dot"></span>
+            Presensi Aktif
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STATISTIK ===== -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-number">{{ totalLahan }}</span>
+        <span class="stat-label">Total Lahan</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">{{ totalHadir }}</span>
+        <span class="stat-label">Hadir</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">{{ totalTidakHadir }}</span>
+        <span class="stat-label">Tidak Hadir</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number">{{ persentaseKehadiran }}%</span>
+        <span class="stat-label">Kehadiran</span>
+      </div>
+    </div>
+
+    <!-- ===== FILTER ===== -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>Lahan</label>
+          <ion-select [(ngModel)]="filterLahan" (ionChange)="applyFilter()" placeholder="Semua Lahan">
+            <ion-select-option value="">Semua Lahan</ion-select-option>
+            <ion-select-option *ngFor="let lahan of daftarLahan" [value]="lahan">{{ lahan }}</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="filter-group">
+          <label>Status</label>
+          <ion-select [(ngModel)]="filterStatus" (ionChange)="applyFilter()" placeholder="Semua Status">
+            <ion-select-option value="">Semua Status</ion-select-option>
+            <ion-select-option value="hadir">Hadir</ion-select-option>
+            <ion-select-option value="tidak">Tidak Hadir</ion-select-option>
+            <ion-select-option value="izin">Izin</ion-select-option>
+            <ion-select-option value="sakit">Sakit</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="filter-group">
+          <label>Periode</label>
+          <ion-select [(ngModel)]="filterPeriode" (ionChange)="applyFilter()" placeholder="Pilih Periode">
+            <ion-select-option value="today">Hari Ini</ion-select-option>
+            <ion-select-option value="week">Minggu Ini</ion-select-option>
+            <ion-select-option value="month">Bulan Ini</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+      <ion-button class="filter-btn" fill="clear" (click)="resetFilter()">
+        <ion-icon name="close-outline"></ion-icon>
+        Reset Filter
+      </ion-button>
+    </div>
+
+    <!-- ===== TABEL ===== -->
+    <div class="table-container">
+      <div class="table-header">
+        <div class="table-title">
+          <h3>Daftar Kehadiran</h3>
+          <span class="table-count">{{ dataKehadiran.length }} Data</span>
+        </div>
+        <ion-button class="export-btn" fill="clear" size="small" (click)="exportData()">
+          <ion-icon name="download-outline"></ion-icon>
+          Export
+        </ion-button>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-container">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Memuat data...</p>
+      </div>
+
+      <div *ngIf="!isLoading && dataKehadiran.length === 0" class="empty-state">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <p>Belum ada data kehadiran</p>
+        <span class="empty-sub">Silakan lakukan absen hari ini</span>
+      </div>
+
+      <div class="table-wrapper" *ngIf="!isLoading && dataKehadiran.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Lahan / Tanaman</th>
+              <th>Kegiatan</th>
+              <th>Tanggal</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of dataKehadiran; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>
+                <span class="lahan-name">{{ item.lahan || 'Lahan A' }}</span>
+                <span class="tanaman-name">{{ item.tanaman || 'Padi' }}</span>
+              </td>
+              <td>{{ item.kegiatan || 'Bekerja' }}</td>
+              <td>{{ item.tanggal }}</td>
+              <td>
+                <span class="status-badge" [class.hadir]="item.status === 'hadir'" 
+                      [class.tidak]="item.status === 'tidak'" 
+                      [class.izin]="item.status === 'izin'" 
+                      [class.sakit]="item.status === 'sakit'">
+                  {{ item.status }}
+                </span>
+              </td>
+              <td>
+                <ion-button fill="clear" size="small" class="action-btn" (click)="ubahStatus(item)">
+                  <ion-icon name="create-outline"></ion-icon>
+                </ion-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== PAGINATION ===== -->
+      <div class="table-footer" *ngIf="!isLoading && dataKehadiran.length > 0">
+        <div class="rows-info">
+          <span>Rows per page:</span>
+          <ion-select [(ngModel)]="rowsPerPage" (ionChange)="onRowsPerPageChange()" interface="popover">
+            <ion-select-option value="5">5</ion-select-option>
+            <ion-select-option value="10">10</ion-select-option>
+            <ion-select-option value="25">25</ion-select-option>
+            <ion-select-option value="50">50</ion-select-option>
+          </ion-select>
+          <span>{{ startIndex + 1 }}-{{ endIndex }} of {{ totalData }}</span>
+        </div>
+        <div class="pagination-buttons">
+          <ion-button fill="clear" size="small" (click)="prevPage()" [disabled]="currentPage === 1">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </ion-button>
+          <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+          <ion-button fill="clear" size="small" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TOMBOL ABSEN ===== -->
+    <div class="absen-actions">
+      <ion-button class="absen-btn hadir-btn" expand="block" (click)="absen('hadir')">
+        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+        Absen Hadir
+      </ion-button>
+      <div class="absen-sub-actions">
+        <ion-button class="absen-sub-btn izin-btn" (click)="absen('izin')">
+          <ion-icon name="time-outline"></ion-icon>
+          Izin
+        </ion-button>
+        <ion-button class="absen-sub-btn sakit-btn" (click)="absen('sakit')">
+          <ion-icon name="medkit-outline"></ion-icon>
+          Sakit
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

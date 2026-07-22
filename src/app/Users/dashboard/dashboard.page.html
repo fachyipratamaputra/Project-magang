@@ -1,0 +1,198 @@
+<ion-content class="dashboard-content">
+  <div class="dashboard-container">
+    <!-- ===== SIDEBAR KIRI ===== -->
+    <div class="sidebar" [class.open]="isSidebarOpen">
+      <!-- Header Sidebar -->
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <ion-icon name="leaf-outline" class="logo-icon"></ion-icon>
+          <span class="logo-text">PEKERJA PETANI</span>
+        </div>
+        <ion-button class="sidebar-close" fill="clear" (click)="toggleSidebar()">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Profil Sidebar -->
+      <div class="sidebar-user">
+        <div class="avatar-wrapper">
+          <img 
+            [src]="'https://ui-avatars.com/api/?name=' + (user.nama || 'Pekerja') + '&background=2e7d32&color=fff&size=128&bold=true'" 
+            alt="Avatar"
+            class="sidebar-avatar"
+          />
+          <div class="online-status"></div>
+        </div>
+        <div class="sidebar-user-info">
+          <h4 class="sidebar-username">{{ user.nama || 'Pekerja' }}</h4>
+          <p class="sidebar-userrole">👨‍🌾 {{ user.posisi || 'Pemilik Lahan' }}</p>
+        </div>
+      </div>
+
+      <!-- Menu Sidebar -->
+      <div class="sidebar-menu">
+        <div class="menu-item" [class.active]="activeMenu === 'dashboard'" (click)="setActiveMenu('dashboard')">
+          <ion-icon name="grid-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Dashboard</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'profil'" (click)="setActiveMenu('profil')">
+          <ion-icon name="person-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Profil</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'absensi'" (click)="setActiveMenu('absensi')">
+          <ion-icon name="calendar-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Absensi</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'gaji'" (click)="setActiveMenu('gaji')">
+          <ion-icon name="cash-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Gaji</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'lahan'" (click)="setActiveMenu('lahan')">
+          <ion-icon name="map-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Lahan</span>
+        </div>
+        <!-- 🔥 MENU BERITA - Navigasi ke halaman terpisah -->
+        <div class="menu-item" [class.active]="activeMenu === 'berita'" (click)="setActiveMenu('berita')">
+          <ion-icon name="newspaper-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Berita</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'notifikasi'" (click)="setActiveMenu('notifikasi')">
+          <ion-icon name="notifications-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Notifikasi</span>
+          <span class="menu-badge danger" *ngIf="notifikasiBelumDibaca > 0">{{ notifikasiBelumDibaca }}</span>
+        </div>
+        <div class="menu-item" [class.active]="activeMenu === 'pengaturan'" (click)="setActiveMenu('pengaturan')">
+          <ion-icon name="settings-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Pengaturan</span>
+        </div>
+        <div class="menu-item logout-item" (click)="logout()">
+          <ion-icon name="log-out-outline" class="menu-icon"></ion-icon>
+          <span class="menu-text">Keluar</span>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span>© 2026 Petani</span>
+      </div>
+    </div>
+
+    <!-- ===== OVERLAY (untuk mobile) ===== -->
+    <div class="sidebar-overlay" [class.open]="isSidebarOpen" (click)="toggleSidebar()"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+      <!-- Header -->
+      <div class="main-header">
+        <div class="header-left">
+          <ion-button class="menu-toggle" fill="clear" (click)="toggleSidebar()">
+            <ion-icon name="menu-outline"></ion-icon>
+          </ion-button>
+          <div class="brand">
+            <ion-icon name="leaf-outline" class="brand-icon"></ion-icon>
+            <span>PETANI INDONESIA</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <ion-button class="notif-btn" fill="clear" (click)="setActiveMenu('notifikasi')">
+            <ion-icon name="notifications-outline"></ion-icon>
+            <span class="notif-badge" *ngIf="notifikasiBelumDibaca > 0">{{ notifikasiBelumDibaca }}</span>
+          </ion-button>
+          <div class="header-avatar" (click)="setActiveMenu('profil')">
+            <img 
+              [src]="'https://ui-avatars.com/api/?name=' + (user.nama || 'Pekerja') + '&background=2e7d32&color=fff&size=64&bold=true'" 
+              alt="Avatar"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CONTENT AREA ===== -->
+      <div class="content-area">
+        <!-- DASHBOARD CONTENT -->
+        <div *ngIf="activeMenu === 'dashboard'">
+          <!-- Profil Card -->
+          <div class="profile-card">
+            <div class="profile-card-content">
+              <div class="profile-avatar-wrapper">
+                <ion-avatar class="profile-avatar-large">
+                  <img 
+                    [src]="'https://ui-avatars.com/api/?name=' + (user.nama || 'Pekerja') + '&background=2e7d32&color=fff&size=128&bold=true'" 
+                    alt="Profile" 
+                  />
+                  <div class="online-indicator"></div>
+                </ion-avatar>
+              </div>
+              <div class="profile-info">
+                <h2 class="profile-name">{{ user.nama || 'Pekerja' }}</h2>
+                <p class="profile-role">👨‍🌾 {{ user.posisi || 'Pemilik Lahan' }}</p>
+                <div class="profile-badge">
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                  <span>Terverifikasi</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Welcome Card -->
+          <div class="welcome-card">
+            <div class="welcome-header">
+              <div class="welcome-icon">🌾</div>
+              <h1 class="welcome-title">Selamat Datang Kembali</h1>
+              <h2 class="welcome-name">{{ user.nama || 'Pekerja Petani' }}</h2>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="welcome-body">
+              <p class="welcome-description">
+                Mulailah perjalanan pertanianmu dengan lebih mudah, cepat, 
+                praktis dan jadikan portal ini sebagai partner terbaik dalam 
+                meraih prestasi dan kesuksesan di dunia pertanian.
+              </p>
+              <p class="welcome-description">
+                Selamat bekerja, selamat berkarya, dan selamat meraih 
+                pencapaian baru!
+              </p>
+            </div>
+
+            <div class="welcome-footer">
+              <span class="date-display">{{ todayDate }}</span>
+            </div>
+          </div>
+
+          <!-- ===== RIWAYAT AKTIVITAS ===== -->
+          <div class="activity-card">
+            <div class="card-header">
+              <h4 class="card-title">🕐 Aktivitas Terbaru</h4>
+            </div>
+            <div class="activity-list" *ngIf="aktivitasTerbaru.length > 0">
+              <div class="activity-item" *ngFor="let item of aktivitasTerbaru">
+                <div class="activity-icon" [class]="item.type">
+                  <ion-icon [name]="item.icon"></ion-icon>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-text">{{ item.text }}</p>
+                  <span class="activity-time">{{ item.time }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="activity-empty" *ngIf="aktivitasTerbaru.length === 0 && !isLoading">
+              <ion-icon name="time-outline"></ion-icon>
+              <p>Belum ada aktivitas tercatat</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLACEHOLDER UNTUK MENU LAIN -->
+        <div *ngIf="activeMenu !== 'dashboard'" class="placeholder-page">
+          <div class="placeholder-icon">
+            <ion-icon [name]="getMenuIcon()"></ion-icon>
+          </div>
+          <h2 class="placeholder-title">{{ getPageTitle() }}</h2>
+          <p class="placeholder-text">Halaman ini sedang dalam pengembangan</p>
+          <p class="placeholder-sub">Segera hadir untuk memudahkan aktivitas pertanian Anda 🌿</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

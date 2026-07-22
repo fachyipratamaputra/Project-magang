@@ -1,0 +1,146 @@
+<ion-content class="lahan-content">
+  <div class="lahan-container">
+    <!-- ===== HEADER ===== -->
+    <div class="lahan-header">
+      <div class="header-back" (click)="goBack()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </div>
+      <h1 class="header-title">Lahan Pertanian</h1>
+      <div class="header-action" (click)="refreshData()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </div>
+    </div>
+
+    <!-- ===== PROFIL PEKERJA ===== -->
+    <div class="profile-card">
+      <div class="profile-row">
+        <div class="profile-item">
+          <span class="profile-label">Nama</span>
+          <span class="profile-value">{{ user.nama || 'Pekerja' }}</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">ID Pekerja</span>
+          <span class="profile-value">{{ user.id || 'PK-001' }}</span>
+        </div>
+      </div>
+      <div class="profile-row">
+        <div class="profile-item">
+          <span class="profile-label">Posisi</span>
+          <span class="profile-value">{{ user.posisi || 'Pemilik Lahan' }}</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">Total Lahan</span>
+          <span class="profile-value">{{ totalLahan }} Lahan</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RINGKASAN LAHAN ===== -->
+    <div class="summary-card">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-value">{{ totalLahan }}</span>
+          <span class="summary-label">Total Lahan</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-item">
+          <span class="summary-value">{{ totalLuas }} Ha</span>
+          <span class="summary-label">Total Luas</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-item">
+          <span class="summary-value text-success">{{ lahanAktif }}</span>
+          <span class="summary-label">Lahan Aktif</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-item">
+          <span class="summary-value text-warning">{{ lahanDitanami }}</span>
+          <span class="summary-label">Ditanami</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FILTER ===== -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>Status</label>
+          <ion-select [(ngModel)]="filterStatus" (ionChange)="applyFilter()" placeholder="Semua Status">
+            <ion-select-option value="">Semua Status</ion-select-option>
+            <ion-select-option value="aktif">Aktif</ion-select-option>
+            <ion-select-option value="ditanami">Ditanami</ion-select-option>
+            <ion-select-option value="panen">Panen</ion-select-option>
+            <ion-select-option value="istirahat">Istirahat</ion-select-option>
+          </ion-select>
+        </div>
+        <div class="filter-group">
+          <label>Urutkan</label>
+          <ion-select [(ngModel)]="filterSort" (ionChange)="applyFilter()" placeholder="Urutkan">
+            <ion-select-option value="terbaru">Terbaru</ion-select-option>
+            <ion-select-option value="terlama">Terlama</ion-select-option>
+            <ion-select-option value="luas_terbesar">Luas Terbesar</ion-select-option>
+            <ion-select-option value="luas_terkecil">Luas Terkecil</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LOADING ===== -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Memuat data lahan...</p>
+    </div>
+
+    <!-- ===== DATA KOSONG ===== -->
+    <div *ngIf="!isLoading && dataLahan.length === 0" class="empty-state">
+      <ion-icon name="map-outline"></ion-icon>
+      <p>Belum ada data lahan</p>
+      <span class="empty-sub">Lahan akan muncul di sini</span>
+    </div>
+
+    <!-- ===== GRID LAHAN ===== -->
+    <div class="lahan-grid" *ngIf="!isLoading && dataLahan.length > 0">
+      <div class="lahan-card" *ngFor="let item of dataLahan" (click)="lihatDetail(item)">
+        <div class="lahan-image">
+          <img [src]="item.gambar || 'assets/default-lahan.jpg'" alt="{{ item.nama }}" (error)="handleImageError($event)" />
+          <span class="lahan-status" [class.aktif]="item.status === 'aktif'" 
+                [class.ditanami]="item.status === 'ditanami'"
+                [class.panen]="item.status === 'panen'"
+                [class.istirahat]="item.status === 'istirahat'">
+            {{ item.status }}
+          </span>
+        </div>
+        <div class="lahan-body">
+          <h3 class="lahan-name">{{ item.nama }}</h3>
+          <div class="lahan-details">
+            <span class="lahan-lokasi">
+              <ion-icon name="location-outline"></ion-icon>
+              {{ item.lokasi || 'Lokasi tidak tersedia' }}
+            </span>
+            <span class="lahan-luas">
+              <ion-icon name="resize-outline"></ion-icon>
+              {{ item.luas }} Ha
+            </span>
+          </div>
+          <div class="lahan-info">
+            <div class="info-item">
+              <span class="info-label">Tanaman</span>
+              <span class="info-value">{{ item.tanaman || '-' }}</span>
+            </div>
+            <div class="info-divider"></div>
+            <div class="info-item">
+              <span class="info-label">Tanggal Tanam</span>
+              <span class="info-value">{{ item.tanggal_tanam || '-' }}</span>
+            </div>
+          </div>
+          <div class="lahan-progress" *ngIf="item.progress">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="item.progress"></div>
+            </div>
+            <span class="progress-text">{{ item.progress }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

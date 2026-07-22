@@ -13,7 +13,7 @@ export class ApiService {
     this.token = localStorage.getItem('token') || '';
   }
 
-  setToken(token: string): void {
+  setToken(token: string) {
     this.token = token;
     localStorage.setItem('token', token);
   }
@@ -22,8 +22,7 @@ export class ApiService {
     return this.token || localStorage.getItem('token') || '';
   }
 
-  // 🔥 CLEAR TOKEN - HAPUS SEMUA DATA SESSION
-  clearToken(): void {
+  clearToken() {
     this.token = '';
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -36,17 +35,21 @@ export class ApiService {
     });
   }
 
-  // ===== TEST KONEKSI =====
+  // ==========================================
+  // TEST
+  // ==========================================
   testConnection(): Observable<any> {
     return this.http.get(`${this.baseUrl}/test`);
   }
 
-  // ===== AUTH =====
+  // ==========================================
+  // AUTH
+  // ==========================================
   login(data: { username: string, password: string }): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/login`, data);
   }
 
-  register(data: { nama: string, username: string, email: string, password: string }): Observable<any> {
+  register(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/register`, data);
   }
 
@@ -58,7 +61,9 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/auth/logout`, {}, { headers: this.getHeaders() });
   }
 
-  // ===== USERS =====
+  // ==========================================
+  // USERS
+  // ==========================================
   getUsers(): Observable<any> {
     return this.http.get(`${this.baseUrl}/users`, { headers: this.getHeaders() });
   }
@@ -79,7 +84,9 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/users/${id}`, { headers: this.getHeaders() });
   }
 
-  // ===== PEKERJA =====
+  // ==========================================
+  // PEKERJA
+  // ==========================================
   getPekerja(): Observable<any> {
     return this.http.get(`${this.baseUrl}/pekerja`, { headers: this.getHeaders() });
   }
@@ -100,7 +107,9 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/pekerja/${id}`, { headers: this.getHeaders() });
   }
 
-  // ===== KEHADIRAN =====
+  // ==========================================
+  // KEHADIRAN
+  // ==========================================
   getKehadiran(tanggal?: string): Observable<any> {
     const url = tanggal ? `${this.baseUrl}/kehadiran?tanggal=${tanggal}` : `${this.baseUrl}/kehadiran`;
     return this.http.get(url, { headers: this.getHeaders() });
@@ -130,7 +139,9 @@ export class ApiService {
     return this.http.get(url, { headers: this.getHeaders() });
   }
 
-  // ===== PEMBAYARAN =====
+  // ==========================================
+  // PEMBAYARAN
+  // ==========================================
   getPembayaran(periode?: string): Observable<any> {
     const url = periode ? `${this.baseUrl}/pembayaran?periode=${periode}` : `${this.baseUrl}/pembayaran`;
     return this.http.get(url, { headers: this.getHeaders() });
@@ -164,18 +175,121 @@ export class ApiService {
     return this.http.get(url, { headers: this.getHeaders() });
   }
 
-  // ===== DASHBOARD =====
-  getDashboard(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/dashboard`, { headers: this.getHeaders() });
+  // ==========================================
+  // 📰 BERITA (UNIVERSAL)
+  // ==========================================
+  getBerita(kategori?: string, status?: string): Observable<any> {
+    let url = `${this.baseUrl}/berita`;
+    const params = [];
+    if (kategori && kategori !== 'semua' && kategori !== '') {
+      params.push(`kategori=${encodeURIComponent(kategori)}`);
+    }
+    if (status && status !== 'semua' && status !== '') {
+      params.push(`status=${encodeURIComponent(status)}`);
+    }
+    if (params.length) {
+      url += `?${params.join('&')}`;
+    }
+    return this.http.get(url, { headers: this.getHeaders() });
   }
 
-  // ===== LAHAN =====
+  createBerita(data: FormData): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+    return this.http.post(`${this.baseUrl}/berita`, data, { headers });
+  }
+
+  updateBerita(id: number, data: FormData): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+    return this.http.put(`${this.baseUrl}/berita/${id}`, data, { headers });
+  }
+
+  deleteBerita(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/berita/${id}`, { headers: this.getHeaders() });
+  }
+
+  getKategoriBerita(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/berita/kategori/list`, { headers: this.getHeaders() });
+  }
+
+  getBeritaPublic(kategori?: string, limit?: number): Observable<any> {
+    let url = `${this.baseUrl}/berita/public`;
+    const params = [];
+    if (kategori && kategori !== 'semua' && kategori !== '') {
+      params.push(`kategori=${encodeURIComponent(kategori)}`);
+    }
+    if (limit) {
+      params.push(`limit=${limit}`);
+    }
+    if (params.length) {
+      url += `?${params.join('&')}`;
+    }
+    return this.http.get(url);
+  }
+
+  // ==========================================
+  // 🔔 NOTIFIKASI
+  // ==========================================
+  getNotifikasi(status?: string): Observable<any> {
+    const url = status ? `${this.baseUrl}/notifikasi?status=${status}` : `${this.baseUrl}/notifikasi`;
+    return this.http.get(url, { headers: this.getHeaders() });
+  }
+
+  getNotifikasiByUser(user_id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/notifikasi/user/${user_id}`, { headers: this.getHeaders() });
+  }
+
+  getNotifikasiById(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/notifikasi/${id}`, { headers: this.getHeaders() });
+  }
+
+  createNotifikasi(data: FormData): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+    return this.http.post(`${this.baseUrl}/notifikasi`, data, { headers });
+  }
+
+  approveNotifikasi(id: number, pesan_admin?: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/notifikasi/${id}/approve`, { pesan_admin }, { headers: this.getHeaders() });
+  }
+
+  rejectNotifikasi(id: number, pesan_admin?: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/notifikasi/${id}/reject`, { pesan_admin }, { headers: this.getHeaders() });
+  }
+
+  deleteNotifikasi(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/notifikasi/${id}`, { headers: this.getHeaders() });
+  }
+
+  getCountNotifikasiPending(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/notifikasi/count/pending`, { headers: this.getHeaders() });
+  }
+
+  markNotifikasiRead(id: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/notifikasi/${id}/read`, {}, { headers: this.getHeaders() });
+  }
+
+  markAllNotifikasiRead(ids: number[]): Observable<any> {
+    return this.http.put(`${this.baseUrl}/notifikasi/mark-all-read`, { ids }, { headers: this.getHeaders() });
+  }
+
+  // ==========================================
+  // LAHAN
+  // ==========================================
   getLahan(): Observable<any> {
     return this.http.get(`${this.baseUrl}/lahan`, { headers: this.getHeaders() });
   }
 
   getLahanById(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/lahan/${id}`, { headers: this.getHeaders() });
+  }
+
+  getLahanByPekerja(pekerja_id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/lahan/pekerja/${pekerja_id}`, { headers: this.getHeaders() });
   }
 
   createLahan(data: any): Observable<any> {
@@ -190,45 +304,10 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/lahan/${id}`, { headers: this.getHeaders() });
   }
 
-  // ===== TANAMAN =====
-  getTanaman(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/tanaman`, { headers: this.getHeaders() });
-  }
-
-  getTanamanById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/tanaman/${id}`, { headers: this.getHeaders() });
-  }
-
-  createTanaman(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/tanaman`, data, { headers: this.getHeaders() });
-  }
-
-  updateTanaman(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/tanaman/${id}`, data, { headers: this.getHeaders() });
-  }
-
-  deleteTanaman(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/tanaman/${id}`, { headers: this.getHeaders() });
-  }
-
-  // ===== PANEN =====
-  getPanen(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/panen`, { headers: this.getHeaders() });
-  }
-
-  getPanenById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/panen/${id}`, { headers: this.getHeaders() });
-  }
-
-  createPanen(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/panen`, data, { headers: this.getHeaders() });
-  }
-
-  updatePanen(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/panen/${id}`, data, { headers: this.getHeaders() });
-  }
-
-  deletePanen(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/panen/${id}`, { headers: this.getHeaders() });
+  // ==========================================
+  // DASHBOARD
+  // ==========================================
+  getDashboard(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/dashboard`, { headers: this.getHeaders() });
   }
 }

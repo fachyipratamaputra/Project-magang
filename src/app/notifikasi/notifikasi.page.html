@@ -1,0 +1,251 @@
+<ion-content class="notifikasi-content">
+  <div class="container">
+    
+    <!-- ===== HEADER ===== -->
+    <div class="page-header">
+      <div class="header-left">
+        <ion-button fill="clear" class="back-btn" (click)="goBack()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <div>
+          <h1 class="page-title">🔔 Notifikasi</h1>
+          <p class="page-subtitle">Kelola permintaan posting dari pengguna</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <ion-badge class="pending-badge" *ngIf="pendingCount > 0">
+          {{ pendingCount }} Pending
+        </ion-badge>
+      </div>
+    </div>
+
+    <!-- ===== FILTER ===== -->
+    <div class="filter-section">
+      <ion-select [(ngModel)]="filterStatus" placeholder="Semua Status" (ionChange)="loadNotifikasi()">
+        <ion-select-option value="semua">Semua Status</ion-select-option>
+        <ion-select-option value="pending">⏳ Pending</ion-select-option>
+        <ion-select-option value="approved">✅ Approved</ion-select-option>
+        <ion-select-option value="rejected">❌ Rejected</ion-select-option>
+      </ion-select>
+    </div>
+
+    <!-- ===== LIST NOTIFIKASI ===== -->
+    <div class="notifikasi-list">
+      <div class="notifikasi-item" *ngFor="let item of notifikasi">
+        <!-- Status Indicator -->
+        <div class="notifikasi-status" 
+             [class.pending]="item.status === 'pending'" 
+             [class.approved]="item.status === 'approved'" 
+             [class.rejected]="item.status === 'rejected'">
+        </div>
+
+        <!-- Content -->
+        <div class="notifikasi-content">
+          <div class="notifikasi-header">
+            <h3>{{ item.judul }}</h3>
+            <span class="user-name">👤 {{ item.user_nama || 'Unknown' }}</span>
+          </div>
+
+          <!-- 🔥 Gambar - sekarang bisa diklik untuk full-size -->
+          <div 
+            class="notifikasi-gambar" 
+            *ngIf="item.gambar"
+            (click)="openImagePreview('http://localhost:3000/uploads/notifikasi/' + item.gambar)"
+          >
+            <img [src]="'http://localhost:3000/uploads/notifikasi/' + item.gambar" alt="Gambar">
+            <div class="gambar-zoom-hint">
+              <ion-icon name="expand-outline"></ion-icon>
+              <span>Klik untuk perbesar</span>
+            </div>
+          </div>
+
+          <p>{{ item.deskripsi }}</p>
+          
+          <div class="notifikasi-footer">
+            <div class="footer-left">
+              <span class="kategori-badge">{{ item.kategori || 'Umum' }}</span>
+              <span class="tanggal">{{ item.created_at | date:'dd MMM yyyy HH:mm' }}</span>
+            </div>
+            <div class="footer-right">
+              <span class="status-text" 
+                    [class.pending]="item.status === 'pending'" 
+                    [class.approved]="item.status === 'approved'" 
+                    [class.rejected]="item.status === 'rejected'">
+                {{ item.status === 'pending' ? '⏳ Pending' : 
+                   item.status === 'approved' ? '✅ Approved' : '❌ Rejected' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Pesan Admin -->
+          <div class="pesan-admin" *ngIf="item.pesan_admin">
+            <ion-icon name="chatbubble-outline"></ion-icon>
+            <span>{{ item.pesan_admin }}</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="notifikasi-actions" *ngIf="item.status === 'pending'">
+          <ion-button fill="clear" color="success" (click)="approveNotifikasi(item)">
+            <ion-icon name="checkmark-outline"></ion-icon>
+            Approve
+          </ion-button>
+          <ion-button fill="clear" color="danger" (click)="rejectNotifikasi(item)">
+            <ion-icon name="close-outline"></ion-icon>
+            Reject
+          </ion-button>
+        </div>
+        <div class="notifikasi-actions" *ngIf="item.status !== 'pending'">
+          <ion-button fill="clear" color="danger" (click)="hapusNotifikasi(item)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EMPTY STATE ===== -->
+    <div class="empty-state" *ngIf="notifikasi.length === 0 && !isLoading">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <h3>Tidak Ada Notifikasi</h3>
+      <p>Belum ada permintaan posting dari pengguna</p>
+    </div>
+
+    <!-- ===== LOADING ===== -->
+    <div class="loading-state" *ngIf="isLoading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Memuat notifikasi...</p>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- ===== MODAL APPROVE ===== -->
+<ion-modal [isOpen]="isApproveModalOpen" (didDismiss)="closeApproveModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>✅ Setujui Posting</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeApproveModal()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="modal-body">
+        <div class="preview-content" *ngIf="selectedNotifikasi">
+          <h3>{{ selectedNotifikasi.judul }}</h3>
+          <div 
+            class="preview-gambar" 
+            *ngIf="selectedNotifikasi.gambar"
+            (click)="openImagePreview('http://localhost:3000/uploads/notifikasi/' + selectedNotifikasi.gambar)"
+          >
+            <img [src]="'http://localhost:3000/uploads/notifikasi/' + selectedNotifikasi.gambar" alt="Preview">
+            <div class="gambar-zoom-hint">
+              <ion-icon name="expand-outline"></ion-icon>
+              <span>Klik untuk perbesar</span>
+            </div>
+          </div>
+          <p>{{ selectedNotifikasi.deskripsi }}</p>
+          <span class="kategori-badge">{{ selectedNotifikasi.kategori || 'Umum' }}</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Pesan untuk User (Opsional)</label>
+          <ion-textarea 
+            placeholder="Tulis pesan untuk user..."
+            [(ngModel)]="pesanAdmin"
+            class="form-textarea"
+            rows="3"
+          ></ion-textarea>
+        </div>
+
+        <div class="modal-actions">
+          <ion-button fill="outline" (click)="closeApproveModal()">Batal</ion-button>
+          <ion-button color="success" (click)="submitApprove()">
+            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+            Setujui & Posting
+          </ion-button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- ===== MODAL REJECT ===== -->
+<ion-modal [isOpen]="isRejectModalOpen" (didDismiss)="closeRejectModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>❌ Tolak Posting</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeRejectModal()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="modal-body">
+        <div class="preview-content" *ngIf="selectedNotifikasi">
+          <h3>{{ selectedNotifikasi.judul }}</h3>
+          <div 
+            class="preview-gambar" 
+            *ngIf="selectedNotifikasi.gambar"
+            (click)="openImagePreview('http://localhost:3000/uploads/notifikasi/' + selectedNotifikasi.gambar)"
+          >
+            <img [src]="'http://localhost:3000/uploads/notifikasi/' + selectedNotifikasi.gambar" alt="Preview">
+            <div class="gambar-zoom-hint">
+              <ion-icon name="expand-outline"></ion-icon>
+              <span>Klik untuk perbesar</span>
+            </div>
+          </div>
+          <p>{{ selectedNotifikasi.deskripsi }}</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Alasan Penolakan <span class="required">*</span></label>
+          <ion-textarea 
+            placeholder="Berikan alasan penolakan..."
+            [(ngModel)]="pesanAdmin"
+            class="form-textarea"
+            rows="3"
+          ></ion-textarea>
+        </div>
+
+        <div class="modal-actions">
+          <ion-button fill="outline" (click)="closeRejectModal()">Batal</ion-button>
+          <ion-button color="danger" (click)="submitReject()" [disabled]="!pesanAdmin">
+            <ion-icon name="close-outline" slot="start"></ion-icon>
+            Tolak
+          </ion-button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- ========================================== -->
+<!-- 🔥 MODAL LIGHTBOX - LIHAT FOTO FULL-SIZE  -->
+<!-- ========================================== -->
+<ion-modal 
+  [isOpen]="isImageModalOpen" 
+  (didDismiss)="closeImagePreview()"
+  class="image-lightbox-modal"
+>
+  <ng-template>
+    <div class="lightbox-container" (click)="closeImagePreview()">
+      <ion-button class="lightbox-close" fill="clear" (click)="closeImagePreview()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+      <img 
+        *ngIf="previewImageUrl" 
+        [src]="previewImageUrl" 
+        alt="Preview Full" 
+        class="lightbox-image"
+        (click)="$event.stopPropagation()"
+      >
+    </div>
+  </ng-template>
+</ion-modal>
