@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../services/api';
 
 @Component({
   selector: 'app-kehadiran',
@@ -20,6 +21,7 @@ export class KehadiranPage implements OnInit {
   rowsPerPage: number = 10;
   currentPage: number = 1;
   totalPages: number = 1;
+  isLoading: boolean = true;
 
   pekerja: any[] = [];
   filteredPekerja: any[] = [];
@@ -31,53 +33,91 @@ export class KehadiranPage implements OnInit {
 
   // ===== 🔥 MODAL TAMBAH KARYAWAN =====
   isModalOpen: boolean = false;
+  isSaving: boolean = false;
   formData: any = {
     nama: '',
     posisi: '',
-    status: 'hadir',
-    alasan: '-',
-    aktif: true
+    username: '',
+    email: '',
+    password: '',
+    lahan: '',
+    no_telepon: '',
+    alamat: ''
   };
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private apiService: ApiService
+  ) {
     this.selectedTanggal = new Date().toISOString().split('T')[0];
   }
 
   ngOnInit() {
-    this.initData();
+    this.loadData();
+  }
+
+  // ============================================
+  // 🔥 LOAD DATA ASLI DARI BACKEND
+  // ============================================
+  loadData() {
+    this.isLoading = true;
+
+    // Ambil list pekerja & kehadiran hari yang dipilih secara paralel
+    this.apiService.getPekerja().subscribe({
+      next: (pekerjaRes: any) => {
+        const pekerjaList = pekerjaRes?.data ?? [];
+
+        this.apiService.getKehadiran(this.selectedTanggal).subscribe({
+          next: (kehadiranRes: any) => {
+            const kehadiranList = kehadiranRes?.data ?? [];
+            this.mergeData(pekerjaList, kehadiranList);
+            this.isLoading = false;
+          },
+          error: (err: any) => {
+            console.error('Gagal memuat kehadiran:', err);
+            // Tetap tampilkan list pekerja walau kehadiran gagal dimuat
+            this.mergeData(pekerjaList, []);
+            this.isLoading = false;
+          }
+        });
+      },
+      error: (err: any) => {
+        console.error('Gagal memuat pekerja:', err);
+        this.isLoading = false;
+        this.pekerja = [];
+        this.filterData();
+      }
+    });
+  }
+
+  // ============================================
+  // 🔥 GABUNGKAN DATA PEKERJA + STATUS KEHADIRAN HARI ITU
+  // ============================================
+  mergeData(pekerjaList: any[], kehadiranList: any[]) {
+    this.pekerja = pekerjaList.map((p: any) => {
+      const kehadiranHariIni = kehadiranList.find((k: any) => k.pekerja_id === p.id);
+
+      return {
+        pekerjaId: p.id,
+        nama: p.nama,
+        posisi: p.posisi,
+        status: kehadiranHariIni?.status || 'belum',   // status kehadiran hari ini
+        alasan: kehadiranHariIni?.alasan || '-',
+        aktif: p.status === 'aktif'                     // status aktif/tidaknya pekerja (bukan kehadiran)
+      };
+    });
+
     this.filterData();
     this.hitungStatistik();
     this.calculatePagination();
-  }
-
-  initData() {
-    this.pekerja = [
-      { nama: 'Bambang Supriyadi', posisi: 'Kepala Lahan', status: 'hadir', alasan: '-', aktif: true },
-      { nama: 'Siti Rahayu', posisi: 'Petani', status: 'hadir', alasan: '-', aktif: true },
-      { nama: 'Agus Setiawan', posisi: 'Petani', status: 'izin', alasan: 'Ada keperluan keluarga', aktif: true },
-      { nama: 'Dewi Lestari', posisi: 'Petani', status: 'hadir', alasan: '-', aktif: true },
-      { nama: 'Joko Widodo', posisi: 'Petani', status: 'sakit', alasan: 'Demam tinggi', aktif: false },
-      { nama: 'Rina Anggraini', posisi: 'Petani', status: 'hadir', alasan: '-', aktif: true },
-      { nama: 'Hendra Gunawan', posisi: 'Petani', status: 'alpha', alasan: 'Tidak ada kabar', aktif: true },
-      { nama: 'Maya Sari', posisi: 'Petani', status: 'hadir', alasan: '-', aktif: true },
-      { nama: 'Dedi Mulyadi', posisi: 'Petani', status: 'izin', alasan: 'Menghadiri acara keluarga', aktif: true },
-      { nama: 'Tuti Rahayu', posisi: 'Petani', status: 'hadir', alasan: '-', aktif: false },
-      { nama: 'Slamet Riyadi', posisi: 'Petani', status: 'sakit', alasan: 'Masuk angin', aktif: true },
-      { nama: 'Yanti Susanti', posisi: 'Petani', status: 'hadir', alasan: '-', aktif: true },
-      { nama: 'Rudi Hartono', posisi: 'Petani', status: 'hadir', alasan: '-', aktif: true },
-      { nama: 'Sri Mulyani', posisi: 'Petani', status: 'izin', alasan: 'Urusan mendadak', aktif: true },
-      { nama: 'Andi Wijaya', posisi: 'Petani', status: 'hadir', alasan: '-', aktif: true }
-    ];
-    this.filteredPekerja = [...this.pekerja];
   }
 
   toggleFilter() { this.showFilter = !this.showFilter; }
 
   onFilterChange() {
     this.currentPage = 1;
-    this.filterData();
-    this.hitungStatistik();
-    this.calculatePagination();
+    // Kalau tanggal berubah, ambil ulang data kehadiran untuk tanggal itu
+    this.loadData();
   }
 
   filterData() {
@@ -90,6 +130,7 @@ export class KehadiranPage implements OnInit {
       data = data.filter(item => item.aktif === isAktif);
     }
     this.filteredPekerja = data;
+    this.calculatePagination();
   }
 
   calculatePagination() {
@@ -109,7 +150,7 @@ export class KehadiranPage implements OnInit {
   onRowsPerPageChange() { this.currentPage = 1; this.calculatePagination(); }
 
   hitungStatistik() {
-    const aktif = this.filteredPekerja.filter(p => p.aktif);
+    const aktif = this.pekerja.filter(p => p.aktif);
     this.totalHadir = aktif.filter(p => p.status === 'hadir').length;
     this.totalIzin = aktif.filter(p => p.status === 'izin').length;
     this.totalSakit = aktif.filter(p => p.status === 'sakit').length;
@@ -117,10 +158,10 @@ export class KehadiranPage implements OnInit {
   }
 
   hitungPersentase(status: string): number {
-    const aktif = this.filteredPekerja.filter(p => p.aktif);
+    const aktif = this.pekerja.filter(p => p.aktif);
     const total = aktif.length || 1;
     let count = 0;
-    switch(status) {
+    switch (status) {
       case 'hadir': count = this.totalHadir; break;
       case 'izin': count = this.totalIzin; break;
       case 'sakit': count = this.totalSakit; break;
@@ -129,18 +170,54 @@ export class KehadiranPage implements OnInit {
     return Math.round((count / total) * 100);
   }
 
+  // ============================================
+  // 🔥 UPDATE STATUS KEHADIRAN — sekarang beneran simpan ke backend
+  // ============================================
   updateStatus(item: any) {
     if (item.status === 'hadir') item.alasan = '-';
-    this.hitungStatistik();
+
+    this.apiService.saveKehadiran({
+      pekerja_id: item.pekerjaId,
+      tanggal: this.selectedTanggal,
+      status: item.status,
+      alasan: item.alasan
+    }).subscribe({
+      next: () => {
+        this.hitungStatistik();
+      },
+      error: (err: any) => {
+        console.error('Gagal update status kehadiran:', err);
+        alert('⚠️ Gagal menyimpan perubahan status. Coba lagi.');
+      }
+    });
   }
 
-  updateAlasan(item: any) {}
+  updateAlasan(item: any) {
+    // Simpan alasan bareng status saat blur/ganti (dipicu manual dari template kalau perlu)
+    this.updateStatus(item);
+  }
 
+  // ============================================
+  // 🔥 TOGGLE AKTIF/TIDAK AKTIF — ini status PEKERJA, beda dari kehadiran
+  // ============================================
   toggleAktif(item: any) {
-    if (!item.aktif) { item.status = 'alpha'; item.alasan = 'Tidak aktif'; } 
-    else { item.status = 'hadir'; item.alasan = '-'; }
-    this.hitungStatistik();
-    this.filterData();
+    const statusBaru = item.aktif ? 'aktif' : 'nonaktif';
+
+    this.apiService.updatePekerja(item.pekerjaId, {
+      nama: item.nama,
+      posisi: item.posisi,
+      status: statusBaru
+    }).subscribe({
+      next: () => {
+        this.filterData();
+        this.hitungStatistik();
+      },
+      error: (err: any) => {
+        console.error('Gagal update status aktif:', err);
+        alert('⚠️ Gagal menyimpan perubahan status aktif.');
+        item.aktif = !item.aktif; // rollback tampilan kalau gagal
+      }
+    });
   }
 
   // ============================================
@@ -150,9 +227,12 @@ export class KehadiranPage implements OnInit {
     this.formData = {
       nama: '',
       posisi: '',
-      status: 'hadir',
-      alasan: '-',
-      aktif: true
+      username: '',
+      email: '',
+      password: '',
+      lahan: '',
+      no_telepon: '',
+      alamat: ''
     };
     this.isModalOpen = true;
   }
@@ -161,52 +241,69 @@ export class KehadiranPage implements OnInit {
     this.isModalOpen = false;
   }
 
+  // 🔥 Auto-suggest username dari nama, tetap bisa diedit manual
+  onNamaChange() {
+    if (!this.formData.username && this.formData.nama) {
+      this.formData.username = this.formData.nama
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '.');
+    }
+  }
+
   simpanKaryawan() {
-    // Validasi
-    if (!this.formData.nama || !this.formData.posisi) {
-      alert('⚠️ Harap isi Nama dan Posisi terlebih dahulu!');
+    if (!this.formData.nama || !this.formData.posisi || !this.formData.username || !this.formData.email || !this.formData.password) {
+      alert('⚠️ Harap isi Nama, Posisi, Username, Email, dan Password!');
       return;
     }
 
-    // Cek duplikat nama
-    const namaExists = this.pekerja.some(
-      p => p.nama.toLowerCase() === this.formData.nama.toLowerCase()
-    );
-    if (namaExists) {
-      alert('⚠️ Nama karyawan sudah terdaftar!');
+    if (this.formData.password.length < 6) {
+      alert('⚠️ Password minimal 6 karakter!');
       return;
     }
 
-    // Kalau status hadir, alasan otomatis '-'
-    if (this.formData.status === 'hadir') {
-      this.formData.alasan = '-';
-    } else if (!this.formData.alasan) {
-      this.formData.alasan = '-';
-    }
+    this.isSaving = true;
 
-    const karyawanBaru = { ...this.formData };
-    this.pekerja.push(karyawanBaru);
-
-    alert(`✅ ${karyawanBaru.nama} berhasil ditambahkan!`);
-
-    this.closeModal();
-    this.filterData();
-    this.hitungStatistik();
-    this.calculatePagination();
+    this.apiService.createPekerja(this.formData).subscribe({
+      next: (res: any) => {
+        this.isSaving = false;
+        alert(`✅ ${this.formData.nama} berhasil ditambahkan!`);
+        this.closeModal();
+        this.loadData();
+      },
+      error: (err: any) => {
+        this.isSaving = false;
+        console.error('Gagal tambah karyawan:', err);
+        const pesan = err?.error?.message || 'Gagal menambahkan karyawan.';
+        alert('⚠️ ' + pesan);
+      }
+    });
   }
 
   hapusKaryawan(item: any) {
-    if (confirm(`Apakah Anda yakin ingin menghapus ${item.nama}?`)) {
-      const index = this.pekerja.indexOf(item);
-      if (index !== -1) this.pekerja.splice(index, 1);
-      this.filterData();
-      this.hitungStatistik();
-      this.calculatePagination();
-      alert(`✅ ${item.nama} berhasil dihapus!`);
-    }
+    if (!confirm(`Apakah Anda yakin ingin menghapus ${item.nama}?`)) return;
+
+    this.apiService.deletePekerja(item.pekerjaId).subscribe({
+      next: () => {
+        alert(`✅ ${item.nama} berhasil dihapus!`);
+        this.loadData();
+      },
+      error: (err: any) => {
+        console.error('Gagal hapus karyawan:', err);
+        alert('⚠️ Gagal menghapus karyawan.');
+      }
+    });
   }
 
-  saveAll() { alert('✅ Semua perubahan berhasil disimpan!'); }
-  exportData() { alert('📥 Data berhasil diekspor!'); }
-  goBack() { this.router.navigate(['/dashboard']); }
+  saveAll() {
+    alert('✅ Semua perubahan sudah otomatis tersimpan setiap kali diubah.');
+  }
+
+  exportData() {
+    alert('📥 Fitur export segera hadir!');
+  }
+
+  goBack() {
+    this.router.navigate(['/dashboard']);
+  }
 }

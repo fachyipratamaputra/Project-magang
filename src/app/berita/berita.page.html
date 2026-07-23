@@ -75,7 +75,7 @@
       <div class="berita-card" *ngFor="let item of berita">
         <!-- Gambar -->
         <div class="berita-image" *ngIf="item.gambar">
-          <img [src]="'http://localhost:3000/uploads/berita/' + item.gambar" [alt]="item.judul">
+          <img [src]="apiBaseUrl + item.gambar" [alt]="item.judul" (error)="handleImageError($event)">
           <div class="status-badge" [class.publish]="item.status === 'publish'" [class.draft]="item.status === 'draft'">
             {{ item.status === 'publish' ? '✅ Publish' : '📝 Draft' }}
           </div>
