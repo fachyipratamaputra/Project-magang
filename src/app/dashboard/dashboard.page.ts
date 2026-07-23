@@ -228,12 +228,12 @@ export class DashboardPage implements OnInit, AfterViewInit {
   }
 
   goToBerita() {
-    this.router.navigate(['/berita']);
+    this.router.navigate(['/admin-berita']);
   }
 
-  // 🔥 FIX: path disamain dengan yang didaftarin di app.routes.ts ('notification', bukan 'notifikasi')
+  // 🔥 FIX: route sekarang pakai prefix 'admin-' (admin-notifikasi), bukan 'notification' lagi
   goToNotifikasi() {
-    this.router.navigate(['/notifikasi']);
+    this.router.navigate(['/admin-notifikasi']);
   }
 
   setActiveMenu(menu: string) {
